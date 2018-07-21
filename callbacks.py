@@ -95,6 +95,10 @@ class Callbacks():
 		username = self.ui.usernameEntry.get()
 		password = self.ui.passwordEntry.get()
 		email = self.ui.mailEntry.get()
+		if not self.ui.client.dbcom.checkUsername(username):
+			return False
+		if not self.ui.client.dbcom.checkMail(email):
+			return False
 		self.ui.client.dbcom.add_user(username, password, email)
 		self.ui.buildLogInUI()
 

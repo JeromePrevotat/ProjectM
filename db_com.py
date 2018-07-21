@@ -1,5 +1,6 @@
 import mysql.connector as mysql
 import db_infos
+import re
 
 class DBCom():
 
@@ -77,3 +78,49 @@ class DBCom():
 				return True
 		self.close(conn, cursor)
 		return False
+
+	def getUsernameList(self):
+		conn, cursor = self.connect()
+		self.selectDB(cursor)
+		cursor.execute(
+		"SELECT username FROM Users"
+		)
+		queryReturn = cursor.fetchall()
+		self.close(conn, cursor)
+		return queryReturn
+
+	def getMailList(self):
+		conn, cursor = self.connect()
+		self.selectDB(cursor)
+		cursor.execute(
+		"SELECT email FROM Users"
+		)
+		queryReturn = cursor.fetchall()
+		self.close(conn, cursor)
+		return queryReturn
+
+	def checkUsername(self, username):
+		usernameList = self.getUsernameList()
+		i = 0
+		for usernameTuple in usernameList:
+			usernameList[i] = usernameTuple[0]
+			i += 1
+		if not re.search(r"[A-Za-z0-9_-]{4,}", username):
+			return False
+		for registered in usernameList:
+			if registered == username:
+				return False
+		return True
+
+	def checkMail(self, email):
+		emailList = self.getMailList()
+		i = 0
+		for mailTuple in emailList:
+			emailList[i] = mailTuple[0]
+			i += 1
+		if not re.search(r"^[A-Za-z0-9\.]+@{1}[A-Za-z]+\.{1}[a-z]{2,}$", email):
+			return False
+		for registered in emailList:
+			if registered == email:
+				return False
+		return True
