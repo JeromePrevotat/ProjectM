@@ -82,7 +82,7 @@ class Threads():
 				self.client.gui.userList.delete(1.0, tk.END)
 				self.client.gui.userList.insert(tk.INSERT, msg.decode()[9:])
 				self.client.gui.userList.config(state='disabled')
-			elif msg.decode() != '' and msg.decode()[:9] != '?REQUEST\n':
+			elif msg.decode() != '' and msg.decode()[:9] != '?REQUEST\n' and msg.decode()[:6] != '?PING\n':
 				self.client.gui.msgOutput.config(state='normal')
 				self.client.gui.msgOutput.insert(tk.INSERT, msg.decode() + '\nAt ' + tFormat.get_time_format(self.client.gui) + '\n')
 				self.client.gui.msgOutput.config(state='disabled')
@@ -90,4 +90,4 @@ class Threads():
 	def userListThread(self):
 		while self.client.server.connected:
 			self.client.socket.send('?REQUEST\n'.encode())
-			time.sleep(0.5)
+			time.sleep(0.2)

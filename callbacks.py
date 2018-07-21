@@ -19,7 +19,8 @@ class Callbacks():
 
 	def sendMsg(self, ui):
 		msg = ui.msgInput.get(1.0, tk.END)
-		if msg != '':
+		if msg != '' and msg != '\n':
+			print('>' + msg + '<')
 			ui.client.socket.send(msg.encode())
 			ui.msgInput.delete(1.0, tk.END)
 			self.ui.msgOutput.config(state='normal')

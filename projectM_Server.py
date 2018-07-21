@@ -38,6 +38,7 @@ class ProjectM_Server():
 			self.accept_connexion()
 			#Listen to users
 			if self.user_list != []:
+				self.connectionCheck()
 				try:
 					self.to_read, wlist, xlist = select.select([u[0] for u in self.user_list],
 					[], [], 0.05)
@@ -53,6 +54,13 @@ class ProjectM_Server():
 			for user in self.user_list:
 				user[0].close()
 			self.online = False
+
+	def connectionCheck(self):
+		for user in self.user_list:
+			try:
+				user[0].send('?PING\n'.encode())
+			except:
+				pass
 
 	def accept_connexion(self):
 		"""Accept newly logged users."""
