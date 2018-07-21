@@ -65,7 +65,10 @@ class DBCom():
 		self.selectDB(cursor)
 		cursor.execute(
 		"SELECT id FROM Users WHERE username = %s", (username,))
-		user_id = cursor.fetchall()[0][0]
+		queryReturn = cursor.fetchall()
+		user_id = None
+		if len(queryReturn) == 1:
+			user_id = queryReturn[0][0]
 		if user_id:
 			cursor.execute(
 			"SELECT password FROM Users WHERE id = %s", (user_id,))
