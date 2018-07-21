@@ -35,16 +35,13 @@ class Gui():
 
 	def buildLogInUI(self):
 		#FRAMES
-		#self.root.resizable(False, False)
 		self.mainFrame.columnconfigure(0, weight=1)
 		self.mainFrame.rowconfigure(0, weight=1)
 		self.logInFrame = tk.Frame(self.mainFrame, width=200, height=300)
 		self.logInFrame.grid(row=0, column=0, sticky='NSEW')
 		self.logInFrame.grid_propagate(False)
-		#
 		self.logInFrame.columnconfigure(0, weight=1)
 		self.logInFrame.rowconfigure((0,1,2), weight=1)
-		#
 		self.infosFrame = tk.Frame(self.logInFrame, width=200, height=200)
 		self.infosFrame.columnconfigure(0, weight=1)
 		self.infosFrame.grid(row=0, column=0, sticky='NSEW')
@@ -83,6 +80,8 @@ class Gui():
 
 	def buildRegister(self):
 		self.mail = tk.StringVar()
+		self.usernameEntry.delete(0, tk.END)
+		self.passwordEntry.delete(0, tk.END)
 		self.mailLabel = tk.Label(self.infosFrame, text=self.res.mail, pady=5)
 		self.mailEntry = tk.Entry(self.infosFrame, textvariable=self.mail)
 		self.mailLabel.grid(row=4 ,column=0)

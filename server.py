@@ -41,7 +41,8 @@ class Server():
 				client.socket.connect(serverInfos)
 				success = True
 				client.gui.msgOutput.config(state='normal')
-				client.gui.msgOutput.insert(tk.INSERT, 'Connexion Successful !\n')
+				client.gui.msgOutput.insert(tk.INSERT, 'Connexion Successful !\nWelcome <'
+				+ client.username + '> !\n')
 				client.gui.msgOutput.config(state='disabled')
 			except:
 				client.gui.msgOutput.config(state='normal')
@@ -53,6 +54,7 @@ class Server():
 			client.gui.msgOutput.config(state='normal')
 			client.gui.msgOutput.insert(tk.INSERT, 'Connexion aborted : Too many failed attempts.\n')
 			client.gui.msgOutput.config(state='disabled')
+			return
 		else:
 			self.updateUsername(client.username, client.socket)
 			client.gui.msgInput.bind('<KeyPress - Return>', lambda event : client.gui.callbacks.sendMsg(client.gui))
