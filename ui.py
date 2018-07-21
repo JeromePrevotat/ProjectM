@@ -35,10 +35,16 @@ class Gui():
 
 	def buildLogInUI(self):
 		#FRAMES
-		self.root.resizable(False, False)
+		#self.root.resizable(False, False)
+		self.mainFrame.columnconfigure(0, weight=1)
+		self.mainFrame.rowconfigure(0, weight=1)
 		self.logInFrame = tk.Frame(self.mainFrame, width=200, height=300)
 		self.logInFrame.grid(row=0, column=0, sticky='NSEW')
 		self.logInFrame.grid_propagate(False)
+		#
+		self.logInFrame.columnconfigure(0, weight=1)
+		self.logInFrame.rowconfigure((0,1,2), weight=1)
+		#
 		self.infosFrame = tk.Frame(self.logInFrame, width=200, height=200)
 		self.infosFrame.columnconfigure(0, weight=1)
 		self.infosFrame.grid(row=0, column=0, sticky='NSEW')
@@ -68,11 +74,11 @@ class Gui():
 		self.logInButton = tk.Button(self.buttonFrame, text=self.res.logIn, width=8,
 		command=self.callbacks.logIn)
 		self.exitButton = tk.Button(self.buttonFrame, text=self.res.exit, width=8)
-		self.registerButton = tk.Button(self.buttonFrame, text=self.res.register,
+		self.registerButton = tk.Button(self.buttonFrame, text=self.res.register, width=8,
 		command=self.buildRegister)
 		self.logInButton.grid(row=1, column=0)
 		self.exitButton.grid(row=1, column=1)
-		self.registerButton.grid(row=0, column=0, columnspan=2, sticky='EW')
+		self.registerButton.grid(row=0, column=0, columnspan=2, padx=5)
 
 	def buildRegister(self):
 		self.mail = tk.StringVar()

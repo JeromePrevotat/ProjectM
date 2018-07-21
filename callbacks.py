@@ -95,12 +95,9 @@ class Callbacks():
 		username = self.ui.usernameEntry.get()
 		password = self.ui.passwordEntry.get()
 		email = self.ui.mailEntry.get()
-		if not self.ui.client.dbcom.checkUsername(username):
-			return False
-		if not self.ui.client.dbcom.checkMail(email):
-			return False
-		self.ui.client.dbcom.add_user(username, password, email)
-		self.ui.buildLogInUI()
+		if self.ui.client.dbcom.checkUsername(username) and self.ui.client.dbcom.checkMail(email):
+			self.ui.client.dbcom.add_user(username, password, email)
+			self.ui.buildLogInUI()
 
 	def logIn(self):
 		username = self.ui.usernameEntry.get()
@@ -109,4 +106,4 @@ class Callbacks():
 			self.ui.client.username = username
 			self.ui.buildMainUI()
 		else:
-			self.ui.errorLabel.config(text='Invalid Username or Password.')
+			self.ui.errorLabel.config(text=self.ui.res.badNamePassCombo)

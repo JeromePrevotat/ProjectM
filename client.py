@@ -20,7 +20,7 @@ class Client():
 		self.guiQueue = Queue()
 		self.user = User('', '', None, '')
 		self.gui = Gui(self)
-		self.dbcom = DBCom()
+		self.dbcom = DBCom(self)
 		#self.absPath = os.path.abspath(os.path.dirname(__file__))
 		if getattr(sys, 'frozen', False):
 			# frozen
@@ -33,7 +33,7 @@ class Client():
 		os.chdir(self.absPath)
 		self.serverList = getServerList(self)
 		self.username = None
-		
+
 	#def useQueue(self):
 		#while True:
 			#try:

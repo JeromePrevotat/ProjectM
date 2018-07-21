@@ -4,6 +4,9 @@ import re
 
 class DBCom():
 
+	def __init__(self, client):
+		self.client = client
+
 	def connect(self):
 		conn = mysql.connect(**db_infos.db_config)
 		cursor = conn.cursor()
@@ -100,27 +103,37 @@ class DBCom():
 		return queryReturn
 
 	def checkUsername(self, username):
+		check = True
 		usernameList = self.getUsernameList()
 		i = 0
 		for usernameTuple in usernameList:
 			usernameList[i] = usernameTuple[0]
 			i += 1
 		if not re.search(r"[A-Za-z0-9_-]{4,}", username):
-			return False
+			self.client.gui.errorLabel.config(text=self.client.gui.errorLabel['text'] +
+			self.client.gui.res.badNameRegex)
+			check = False
 		for registered in usernameList:
 			if registered == username:
-				return False
-		return True
+				self.client.gui.errorLabel.config(text=self.client.gui.errorLabel['text'] +
+				self.client.gui.res.nameTaken)
+				check = False
+		return check
 
 	def checkMail(self, email):
+		check = True
 		emailList = self.getMailList()
 		i = 0
 		for mailTuple in emailList:
 			emailList[i] = mailTuple[0]
 			i += 1
-		if not re.search(r"^[A-Za-z0-9\.]+@{1}[A-Za-z]+\.{1}[a-z]{2,}$", email):
-			return False
+		if not re.search(r"^[A-Za-z0-9\._-]+@{1}[A-Za-z]+\.{1}[a-z]{2,}$", email):
+			self.client.gui.errorLabel.config(text=self.client.gui.errorLabel['text'] +
+			self.client.gui.res.badMailRegex)
+			check = False
 		for registered in emailList:
 			if registered == email:
-				return False
-		return True
+				self.client.gui.errorLabel.config(text=self.client.gui.errorLabel['text'] +
+				self.client.gui.res.mailTaken)
+				check = False
+		return check
