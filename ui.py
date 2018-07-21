@@ -73,7 +73,8 @@ class Gui():
 		#BUTTONS
 		self.logInButton = tk.Button(self.buttonFrame, text=self.res.logIn, width=8,
 		command=self.callbacks.logIn)
-		self.exitButton = tk.Button(self.buttonFrame, text=self.res.exit, width=8)
+		self.exitButton = tk.Button(self.buttonFrame, text=self.res.exit, width=8,
+		command=self.callbacks._quit)
 		self.registerButton = tk.Button(self.buttonFrame, text=self.res.register, width=8,
 		command=self.buildRegister)
 		self.logInButton.grid(row=1, column=0)

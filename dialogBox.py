@@ -100,6 +100,9 @@ class Dialog(tk.Toplevel):
 		self.doneButton = tk.Button(self.buttonFrame, text=self.ui.res.done,
 		width=10, command=lambda : self.ui.callbacks.done(self))
 		self.doneButton.grid(row=0, column=3)
+		self.cancelButton = tk.Button(self.buttonFrame, text=self.ui.res.cancel,
+		width=10, command= lambda : self.ui.callbacks.cancel(self))
+		self.cancelButton.grid(row=0, column=4)
 
 	def buildServerInfos(self):
 		#SERVER NAME

@@ -12,6 +12,11 @@ class Callbacks():
 	def __init__(self, ui):
 		self.ui = ui
 
+	def _quit(self):
+		self.ui.root.quit()
+		self.ui.root.destroy()
+		exit()
+
 	def sendMsg(self, ui):
 		msg = ui.msgInput.get(1.0, tk.END)
 		if msg != '':
