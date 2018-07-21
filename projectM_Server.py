@@ -78,6 +78,11 @@ class ProjectM_Server():
 					for u in self.user_list:
 						if u[0] == user:
 							u[2] = received.decode()[8:]
+				elif received.decode()[:9] == '?REQUEST\n':
+					namelist = '?REQUEST\n'
+					for u in self.user_list:
+						namelist = namelist + u[2] + '\n'
+					user.send(namelist.encode())
 				elif received.decode() != "" and received.decode() != "\n":
 					src = user
 					for u in self.user_list:

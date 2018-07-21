@@ -23,6 +23,9 @@ class Threads():
 		if threadName == 'listenServer':
 			self.newThread = Thread(target= self.listenServer, daemon=True)
 			self.newThread.start()
+		if threadName == 'userList':
+			self.newThread = Thread(target= self.userListThread, daemon=True)
+			self.newThread.start()
 
 	def updateMenu(self, ui):
 		while ui.root.winfo_exists():
@@ -74,7 +77,17 @@ class Threads():
 	def listenServer(self):
 		while True:
 			msg = self.client.socket.recv(1024)
-			if msg.decode() != '':
+			if msg.decode()[:9] == '?REQUEST\n':
+				self.client.gui.userList.config(state='normal')
+				self.client.gui.userList.delete(1.0, tk.END)
+				self.client.gui.userList.insert(tk.INSERT, msg.decode()[9:])
+				self.client.gui.userList.config(state='disabled')
+			elif msg.decode() != '' and msg.decode()[:9] != '?REQUEST\n':
 				self.client.gui.msgOutput.config(state='normal')
 				self.client.gui.msgOutput.insert(tk.INSERT, msg.decode() + '\nAt ' + tFormat.get_time_format(self.client.gui) + '\n')
 				self.client.gui.msgOutput.config(state='disabled')
+
+	def userListThread(self):
+		while self.client.server.connected:
+			self.client.socket.send('?REQUEST\n'.encode())
+			time.sleep(0.5)

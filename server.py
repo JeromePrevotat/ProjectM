@@ -12,6 +12,7 @@ class Server():
 		self.name = name
 		self.address = address
 		self.port = port
+		self.connected = False
 
 	def saveServer(self, absPath=None, saveDir=None, ext=None):
 		if os.path.exists(saveDir) and not os.path.isfile(saveDir):
@@ -35,11 +36,11 @@ class Server():
 		client.gui.msgOutput.insert(tk.INSERT,
 		'Trying to connect to ' + serverInfos[0] + ':' + str(serverInfos[1]) + '\n')
 		client.gui.msgOutput.config(state='disabled')
-		while not success and failed < maxConnexionAttempts:
+		while not self.connected and failed < maxConnexionAttempts:
 			try:
 				client.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 				client.socket.connect(serverInfos)
-				success = True
+				self.connected = True
 				client.gui.msgOutput.config(state='normal')
 				client.gui.msgOutput.insert(tk.INSERT, 'Connexion Successful !\nWelcome <'
 				+ client.username + '> !\n')
@@ -60,6 +61,7 @@ class Server():
 			client.gui.msgInput.bind('<KeyPress - Return>', lambda event : client.gui.callbacks.sendMsg(client.gui))
 			client.gui.sendButton.configure(command= lambda : client.gui.callbacks.sendMsg(client.gui))
 			client.threadList.createThread('listenServer')
+			client.threadList.createThread('userList')
 
 	def updateUsername(self, username, socket):
 		update = '?RENAME\n' + username
