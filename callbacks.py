@@ -6,6 +6,7 @@ import timeformat as tFormat
 from tkinter import ttk, messagebox as mBox
 
 import dialogBox
+import encoding
 from server import Server, getServerList
 
 class Callbacks():
@@ -20,8 +21,9 @@ class Callbacks():
 	def sendMsg(self, ui):
 		msg = ui.msgInput.get(1.0, tk.END)
 		if msg != '' and msg != '\n':
-			print('>' + msg + '<')
-			ui.client.socket.send(msg.encode())
+			encoded_msg = encoding.encode_msg(msg)
+			ui.client.socket.send(encoded_msg.encode())
+			encoding.decode_msg(encoded_msg.encode('utf-8'))
 			ui.msgInput.delete(1.0, tk.END)
 			self.ui.msgOutput.config(state='normal')
 			self.ui.msgOutput.insert(tk.INSERT,'You at ' + tFormat.get_time_format(self.ui) + ' :\n\t' + msg + '\n')
