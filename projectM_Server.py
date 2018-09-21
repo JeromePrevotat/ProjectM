@@ -5,6 +5,8 @@ import socket
 import select
 import datetime
 
+import encoding
+
 class ProjectM_Server():
 	def __init__(self):
 		self.server_address = ''
@@ -99,7 +101,7 @@ class ProjectM_Server():
 					self.send_msg(received, src, username)
 
 	def send_msg(self, msg, src, username):
-		fullMsg = 'From ' + username + ' :\n\t' + msg.decode()
+		fullMsg = 'From ' + username + ' :\n\t' + encoding.decode_msg(msg)
 		fullMsg = fullMsg.encode()
 		for user in self.user_list:
 			if user[0] != src:

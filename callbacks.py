@@ -22,8 +22,7 @@ class Callbacks():
 		msg = ui.msgInput.get(1.0, tk.END)
 		if msg != '' and msg != '\n':
 			encoded_msg = encoding.encode_msg(msg)
-			ui.client.socket.send(encoded_msg.encode())
-			encoding.decode_msg(encoded_msg.encode('utf-8'))
+			ui.client.socket.send(encoded_msg)
 			ui.msgInput.delete(1.0, tk.END)
 			self.ui.msgOutput.config(state='normal')
 			self.ui.msgOutput.insert(tk.INSERT,'You at ' + tFormat.get_time_format(self.ui) + ' :\n\t' + msg + '\n')
