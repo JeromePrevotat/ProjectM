@@ -5,6 +5,8 @@ from threading import Thread
 
 import timeformat as tFormat
 
+import encoding
+
 class Threads():
 	def __init__(self, client):
 		self.client = client
@@ -76,18 +78,23 @@ class Threads():
 
 	def listenServer(self):
 		while True:
-			msg = self.client.socket.recv(1024)
-			if msg.decode()[:9] == '?REQUEST\n':
-				self.client.gui.userList.config(state='normal')
-				self.client.gui.userList.delete(1.0, tk.END)
-				self.client.gui.userList.insert(tk.INSERT, msg.decode()[9:])
-				self.client.gui.userList.config(state='disabled')
-			elif msg.decode() != '' and msg.decode()[:9] != '?REQUEST\n' and msg.decode()[:6] != '?PING\n':
+			received = self.client.socket.recv(1024).decode()
+			while (received != ""):
+				cmd, args, msg, length = encoding.parse_type_received(received)
+				received = received[length:]
+			if cmd:
+				if cmd == "request":
+					self.client.gui.userList.config(state='normal')
+					self.client.gui.userList.delete(1.0, tk.END)
+					self.client.gui.userList.insert(tk.INSERT, args)
+					self.client.gui.userList.config(state='disabled')
+			if msg:
 				self.client.gui.msgOutput.config(state='normal')
-				self.client.gui.msgOutput.insert(tk.INSERT, msg.decode() + '\nAt ' + tFormat.get_time_format(self.client.gui) + '\n')
+				self.client.gui.msgOutput.insert(tk.INSERT, msg + '\nAt ' +
+				tFormat.get_time_format(self.client.gui) + '\n')
 				self.client.gui.msgOutput.config(state='disabled')
 
 	def userListThread(self):
 		while self.client.server.connected:
-			self.client.socket.send('?REQUEST\n'.encode())
+			self.client.socket.send(encoding.encode_cmd("request()"))
 			time.sleep(0.2)

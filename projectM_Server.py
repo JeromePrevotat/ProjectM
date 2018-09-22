@@ -58,9 +58,10 @@ class ProjectM_Server():
 			self.online = False
 
 	def connectionCheck(self):
+		cmd = encoding.encode_cmd("ping()")
 		for user in self.user_list:
 			try:
-				user[0].send('?PING\n'.encode())
+				user[0].send(cmd)
 			except:
 				pass
 
@@ -78,34 +79,42 @@ class ProjectM_Server():
 		"""Get users inputs."""
 		for user in self.to_read:
 			try:
-				received = user.recv(1024)
+				received = user.recv(1024).decode()
 			except ConnectionResetError as err:
 				print("Error : " + os.strerror(err.errno))
 				print(user)
 				self.logout_user(user, True)
 			else:
-				if received.decode()[:8] == '?RENAME\n':
-					for u in self.user_list:
-						if u[0] == user:
-							u[2] = received.decode()[8:]
-				elif received.decode()[:9] == '?REQUEST\n':
-					namelist = '?REQUEST\n'
-					for u in self.user_list:
-						namelist = namelist + u[2] + '\n'
-					user.send(namelist.encode())
-				elif received.decode() != "" and received.decode() != "\n":
-					src = user
-					for u in self.user_list:
-						if u[0] == src:
-							username = u[2]
-					self.send_msg(received, src, username)
+				#NEW
+				#Loop to empty the buffer
+				while (received != ""):
+					cmd, args, msg, length = encoding.parse_type_received(received)
+					#Commands
+					if cmd:
+						if cmd == "rename" and args != "":
+							for u in self.user_list:
+								if u[0] == user:
+									u[2] = args
+						elif cmd == "request":
+							namelist = "request("
+							for u in self.user_list:
+								namelist = namelist + u[2] + '\n'
+							namelist = namelist + ")"
+							user.send(encoding.encode_cmd(namelist))
+					#Messages
+					if not cmd:
+						src = user
+						for u in self.user_list:
+							if u[0] == src:
+								username = u[2]
+						self.send_msg(msg, src, username)
+					received = received[length:]
 
 	def send_msg(self, msg, src, username):
-		fullMsg = 'From ' + username + ' :\n\t' + encoding.decode_msg(msg)
-		fullMsg = fullMsg.encode()
+		fullMsg = 'From ' + username + ' :\n\t' + msg
 		for user in self.user_list:
 			if user[0] != src:
-				user[0].send(fullMsg)
+				user[0].send(encoding.encode_msg(fullMsg))
 
 	def logout_user(self, user, forced):
 		"""Logs out from the server the given user and notifies it,

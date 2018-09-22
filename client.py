@@ -12,6 +12,8 @@ from server import Server, getServerList
 from threads import Threads
 from db_com import DBCom
 
+import encoding
+
 class Client():
 	def __init__(self):
 		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -21,7 +23,6 @@ class Client():
 		self.user = User('', '', None, '')
 		self.gui = Gui(self)
 		self.dbcom = DBCom(self)
-		#self.absPath = os.path.abspath(os.path.dirname(__file__))
 		if getattr(sys, 'frozen', False):
 			# frozen
 			self.absPath = os.path.dirname(sys.executable)
@@ -33,19 +34,6 @@ class Client():
 		os.chdir(self.absPath)
 		self.serverList = getServerList(self)
 		self.username = None
-
-	#def useQueue(self):
-		#while True:
-			#try:
-				#data = self.guiQueue.get(False)
-			#except Empty:
-				#data = None
-			#if data is not None:
-				#print(data)
-
-	#def createThread(self, num):
-		#writeT = Thread(target=self.useQueue, daemon=True)
-		#writeT.start()
 
 if __name__ == "__main__":
 	client = Client()
