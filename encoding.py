@@ -21,6 +21,7 @@ def parse_type_received(src):
 	elif src[0:5] == "<msg>":
 		cmd = False
 	else:
+		print(src)
 		print("TYPE ERROR")
 	cmd, args, received, length = parse_received(cmd, src[5:])
 	return cmd, args, received, length + len(str(length)) + 7

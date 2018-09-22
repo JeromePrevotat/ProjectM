@@ -124,13 +124,13 @@ class ProjectM_Server():
 			i += 1
 		print(str(self.user_list[i][1]) + " logged out. Closing socket.")
 		if not forced:
-			user.send(b"Logout\n")
+			user.send(encoding.encode_msg("Logout\n"))
 		user.close()
-		s = str(self.user_list[i][1]) + " disconnected.\n"
+		s = str(self.user_list[i][2]) + " disconnected.\n"
 		del self.user_list[i]
 		#Broadcast to all users someone disconnected
 		for user in self.user_list:
-			user[0].send(s.encode())
+			user[0].send(encoding.encode_msg(s))
 
 if __name__ == "__main__":
 	pmServer = ProjectM_Server()
