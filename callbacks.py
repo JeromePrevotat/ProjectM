@@ -18,6 +18,13 @@ class Callbacks():
 		self.ui.root.destroy()
 		exit()
 
+	def keyPress_Return(self, _event=None):
+		if (type(self.ui.mainFrame.focus_get()) == tk.Button
+		and self.ui.mainFrame.focus_get().config()['command'] != ''):
+			self.ui.mainFrame.focus_get().invoke()
+		else:
+			self.ui.logInButton.invoke()
+
 	def sendMsg(self, ui):
 		msg = ui.msgInput.get(1.0, tk.END)
 		if msg != '' and msg != '\n':

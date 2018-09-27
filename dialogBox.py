@@ -193,6 +193,7 @@ class Dialog(tk.Toplevel):
 # TO REWRITE                                                                   #
 ################################################################################
 
+	#NOT USED
 	def buttonbox(self):
 		"""Method to create Confirm and Cancel Buttons of the DialogBox."""
 		box = tk.Frame(self)

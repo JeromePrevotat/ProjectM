@@ -85,7 +85,6 @@ class ProjectM_Server():
 				print(user)
 				self.logout_user(user, True)
 			else:
-				#NEW
 				#Loop to empty the buffer
 				while (received != ""):
 					cmd, args, msg, length = encoding.parse_type_received(received)

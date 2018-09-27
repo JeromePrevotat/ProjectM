@@ -1,5 +1,4 @@
 #GUI File
-
 import tkinter as tk
 
 from tkinter import ttk, scrolledtext, Menu
@@ -28,7 +27,7 @@ class Gui():
 		self.root.columnconfigure(0, weight=1)
 
 		#MAIN FRAME
-		self.mainFrame = tk.Frame(self.root)
+		self.mainFrame = tk.Frame(self.root, name='mainFrame')
 		self.mainFrame.grid(row=0, column=0, sticky='NSWE')
 		if not self.client.user.logged :
 			self.buildLogInUI()
@@ -37,7 +36,7 @@ class Gui():
 		#FRAMES
 		self.mainFrame.columnconfigure(0, weight=1)
 		self.mainFrame.rowconfigure(0, weight=1)
-		self.logInFrame = tk.Frame(self.mainFrame, width=200, height=300)
+		self.logInFrame = tk.Frame(self.mainFrame, width=200, height=300, name="logInFrame")
 		self.logInFrame.grid(row=0, column=0, sticky='NSEW')
 		self.logInFrame.grid_propagate(False)
 		self.logInFrame.columnconfigure(0, weight=1)
@@ -69,14 +68,18 @@ class Gui():
 		self.errorLabel.grid(row=4, column=0, padx=5)
 		#BUTTONS
 		self.logInButton = tk.Button(self.buttonFrame, text=self.res.logIn, width=8,
-		command=self.callbacks.logIn)
+		name="logInButton", command=self.callbacks.logIn)
 		self.exitButton = tk.Button(self.buttonFrame, text=self.res.exit, width=8,
-		command=self.callbacks._quit)
+		name="exitButton", command=self.callbacks._quit)
 		self.registerButton = tk.Button(self.buttonFrame, text=self.res.register, width=8,
-		command=self.buildRegister)
+		name="registerButton", command=self.buildRegister)
 		self.logInButton.grid(row=1, column=0)
 		self.exitButton.grid(row=1, column=1)
 		self.registerButton.grid(row=0, column=0, columnspan=2, padx=5)
+
+		#NEW
+		self.logInButton.focus_set()
+		self.mainFrame.bind_all("<Return>", self.callbacks.keyPress_Return)
 
 	def buildRegister(self):
 		self.mail = tk.StringVar()
