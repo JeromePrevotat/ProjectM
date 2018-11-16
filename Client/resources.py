@@ -56,6 +56,8 @@ class Resources():
 		self.mailTaken = 'This Email already exists.\n'
 		self.pseudoWarningTitle = 'Invalid Pseudo Length.'
 		self.pseudoWarningMsg = 'Pseudo must be at least 5 characters length.'
+		self.serverConnectEmptyTitle = 'Connection Failed'
+		self.serverConnectEmptyMsg = 'You did not select any Server.'
 		#DIVERS
 		self.timeFormat = '%H:%M:%S'
 
@@ -106,5 +108,7 @@ class Resources():
 		self.mailTaken = 'Cet Email est déjà utilisé.\n'
 		self.pseudoWarningTitle = 'Longueur de Pseudo invalide'
 		self.pseudoWarningMsg = 'Votre Pseudo doit contenir au moins 5 caractères.'
+		self.serverConnectEmptyTitle = 'Connexion Impossible'
+		self.serverConnectEmptyMsg = 'Vous n\'avez pas selectionné de Serveur.'
 		#DIVERS
 		self.timeFormat = 'De <xxx> à %H:%M:%S :\n\t'

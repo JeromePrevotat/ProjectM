@@ -1,5 +1,6 @@
 import mysql.connector as mysql
 import db_infos
+import bcrypt
 import re
 
 class DBCom():
@@ -19,11 +20,11 @@ class DBCom():
 		cursor.close()
 		conn.close()
 
-	def add_user(self, username, password, email):
+	def add_user(self, username, salt, password, email):
 		conn, cursor = self.connect()
 		self.selectDB(cursor)
 		cursor.execute(
-		"CALL add_user(%s,%s,%s)", (username, password, email)
+		"CALL add_user(%s,%s,%s,%s)", (username, salt, password, email)
 		)
 		conn.commit()
 		self.close(conn, cursor)
@@ -75,8 +76,12 @@ class DBCom():
 			user_id = queryReturn[0][0]
 		if user_id:
 			cursor.execute(
+			"SELECT salt FROM Users WHERE id = %s", (user_id,))
+			salt = cursor.fetchall()[0][0]
+			cursor.execute(
 			"SELECT password FROM Users WHERE id = %s", (user_id,))
-			if password == cursor.fetchall()[0][0]:
+			testedHash = bcrypt.hashpw(password.encode(), salt.encode())
+			if testedHash.decode() == cursor.fetchall()[0][0]:
 				self.close(conn, cursor)
 				return True
 		self.close(conn, cursor)
@@ -87,6 +92,16 @@ class DBCom():
 		self.selectDB(cursor)
 		cursor.execute(
 		"SELECT username FROM Users"
+		)
+		queryReturn = cursor.fetchall()
+		self.close(conn, cursor)
+		return queryReturn
+
+	def getSaltList(self):
+		conn, cursor = self.connect()
+		self.selectDB(cursor)
+		cursor.execute(
+		"SELECT salt FROM Users"
 		)
 		queryReturn = cursor.fetchall()
 		self.close(conn, cursor)
@@ -117,6 +132,19 @@ class DBCom():
 			if registered == username:
 				self.client.gui.errorLabel.config(text=self.client.gui.errorLabel['text'] +
 				self.client.gui.res.nameTaken)
+				check = False
+		return check
+
+	def checkSalt(self, salt):
+		check = True
+		saltList = self.getSaltList()
+		i = 0
+		for saltTuple in saltList:
+			saltList[i] = saltTuple[0]
+			i += 1
+		for registered in saltList:
+			print(registered)
+			if registered == salt:
 				check = False
 		return check
 

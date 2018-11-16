@@ -9,6 +9,8 @@ import dialogBox
 import encoding
 from server import Server, getServerList
 
+import bcrypt
+
 class Callbacks():
 	def __init__(self, ui):
 		self.ui = ui
@@ -83,10 +85,12 @@ class Callbacks():
 			dialbox.serverNameEntry.config(state='disabled')
 			dialbox.addressEntry.config(state='disabled')
 			dialbox.portEntry.config(state='disabled')
+			dialbox.cancel(dialbox)
 		#PERSONNAL INFORMATIONS
 		if dialbox.bodyType == 'personal_informations':
 			if len(dialbox.pseudoStr.get()) >= 5:
 				self.ui.client.username = dialbox.pseudoStr.get()
+				dialbox.cancel(dialbox)
 			else:
 				mBox.showwarning(self.ui.res.pseudoWarningTitle, self.ui.res.pseudoWarningMsg)
 		#CONNECT TO SERVER
@@ -94,23 +98,28 @@ class Callbacks():
 			serverName = dialbox.serverNameEntry.get()
 			serverAddress = dialbox.addressEntry.get()
 			serverPort = dialbox.portEntry.get()
-			if (serverName is not None and
-			serverAddress is not None and
-			serverPort is not None and
+			if (serverName != "" and
+			serverAddress != "" and
+			serverPort != "" and
 			self.ui.client.username is not None and
 			self.ui.client.username != ''):
 				self.ui.client.server.connectTo(serverName, (serverAddress, int(serverPort)), self.ui.client)
-		dialbox.cancel(dialbox)
+				dialbox.cancel(dialbox)
+			else:
+				mBox.showwarning(self.ui.res.serverConnectEmptyTitle, self.ui.res.serverConnectEmptyMsg)
 
 	def serverConnect(self):
 		self.dialBox = dialogBox.Dialog(self.ui, 'connect')
 
 	def newUser(self):
 		username = self.ui.usernameEntry.get()
-		password = self.ui.passwordEntry.get()
+		salt = bcrypt.gensalt()
+		while(not self.ui.client.dbcom.checkSalt(salt)):
+			salt = bcrypt.gensalt()
+		password = bcrypt.hashpw(self.ui.passwordEntry.get().encode(), salt)
 		email = self.ui.mailEntry.get()
 		if self.ui.client.dbcom.checkUsername(username) and self.ui.client.dbcom.checkMail(email):
-			self.ui.client.dbcom.add_user(username, password, email)
+			self.ui.client.dbcom.add_user(username, salt, password, email)
 			self.ui.buildLogInUI()
 
 	def logIn(self):
