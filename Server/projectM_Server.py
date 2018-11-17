@@ -58,11 +58,6 @@ class ProjectM_Server():
 			self.online = False
 
 	def connectionCheck(self):
-
-		#TEST
-		print("connectionCheck()")
-		#ENDTEST
-
 		cmd = encoding.encode_cmd("ping()")
 		for user in self.user_list:
 			try:
@@ -81,11 +76,6 @@ class ProjectM_Server():
 				self.user_list.append([socket, infos, ''])
 
 	def listen_user(self):
-
-		#TEST
-		print("listen_user()")
-		#ENDTEST
-
 		"""Get users inputs."""
 		for user in self.to_read:
 			try:
@@ -120,22 +110,12 @@ class ProjectM_Server():
 					received = received[length:]
 
 	def send_msg(self, msg, src, username):
-
-		#TEST
-		print("send_msg()")
-		#ENDTEST
-
 		fullMsg = 'From ' + username + ' :\n\t' + msg
 		for user in self.user_list:
 			if user[0] != src:
 				user[0].send(encoding.encode_msg(fullMsg))
 
 	def logout_user(self, user, forced):
-
-		#TEST
-		print("logout_user()")
-		#ENDTEST
-
 		"""Logs out from the server the given user and notifies it,
 		except if it's a forced disconnection."""
 		i = 0
