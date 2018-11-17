@@ -44,12 +44,16 @@ class Resources():
 		self.changePassword = 'Change Password'
 		#Change Dialbox
 		self.changePseudoLabel = 'New Pseudo : '
+		self.oldPasswordLabel = 'Old Password : '
 		self.newPasswordLabel = 'New Password : '
+		self.passwordChanged = 'Password changed !'
+		self.passwordTooShort = 'Your new Password is too short.'
+		self.passwordNonIdentical = 'Both new fields must be identical.'
+		self.passwordWrong = 'Wrong Password'
 		#ADD SERVER WINDOW
 		self.serverNameLabel = 'Server Name : '
 		self.adressLabel = 'Server Adress : '
 		self.portLabel = 'Server Port : '
-
 		self.helpMenu = 'Help'
 		self.about = 'About'
 		#ERROR OUTPUT

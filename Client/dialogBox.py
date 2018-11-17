@@ -148,20 +148,40 @@ class Dialog(tk.Toplevel):
 		self.buttonCancel.grid(row=1, column=0)
 
 	def buildChangePassword(self):
-		self.newPasswordStr = tk.StringVar()
-		self.newPasswordLabel = tk.Label(self.masterFrame, text=self.ui.res.newPasswordLabel)
-		self.passwordEntry = tk.Entry(self.masterFrame, textvariable=self.newPasswordStr,
+		#StringVar
+		self.oldPasswordStr = tk.StringVar()
+		self.newPasswordStr1 = tk.StringVar()
+		self.newPasswordStr2 = tk.StringVar()
+		#Labels & Entry
+		self.oldPasswordLabel = tk.Label(self.masterFrame, text=self.ui.res.oldPasswordLabel)
+		self.oldPasswordEntry = tk.Entry(self.masterFrame, textvariable=self.oldPasswordStr,
 		width=20, show='*')
-		self.newPasswordLabel.grid(row=0, column=0)
-		self.passwordEntry.grid(row=0, column=1)
+		self.newPasswordLabel1 = tk.Label(self.masterFrame, text=self.ui.res.newPasswordLabel)
+		self.newPasswordEntry1 = tk.Entry(self.masterFrame, textvariable=self.newPasswordStr1,
+		width=20, show='*')
+		self.newPasswordLabel2 = tk.Label(self.masterFrame, text=self.ui.res.newPasswordLabel)
+		self.newPasswordEntry2 = tk.Entry(self.masterFrame, textvariable=self.newPasswordStr2,
+		width=20, show='*')
+		self.oldPasswordLabel.grid(row=0, column=0)
+		self.oldPasswordEntry.grid(row=0, column=1)
+		self.newPasswordLabel1.grid(row=1, column=0)
+		self.newPasswordEntry1.grid(row=1, column=1)
+		self.newPasswordLabel2.grid(row=2, column=0)
+		self.newPasswordEntry2.grid(row=2, column=1)
+		#Buttons
 		self.buttonFrame = tk.Frame(self.masterFrame)
-		self.buttonFrame.grid(row=1, column=1)
+		self.buttonFrame.grid(row=3, column=1)
 		self.buttonDone = tk.Button(self.buttonFrame, text='Done', width=8,
 		command= lambda : self.ui.callbacks.done(self))
-		self.buttonDone.grid(row=1, column=1)
+		self.buttonDone.grid(row=0, column=1)
 		self.buttonCancel = tk.Button(self.buttonFrame, text='Cancel', width=8,
 		command= lambda : self.ui.callbacks.cancel(self))
-		self.buttonCancel.grid(row=1, column=0)
+		self.buttonCancel.grid(row=0, column=0)
+		#Output Frame
+		self.outputFrame = tk.Frame(self.masterFrame)
+		self.outputFrame.grid(row=4, column=0, columnspan=2)
+		self.outputLabel = tk.Label(self.outputFrame, wraplength=190)
+		self.outputLabel.grid(row=0, column=0)
 
 	def buildConnect(self):
 		self.serverListFrame = tk.Frame(self.masterFrame)

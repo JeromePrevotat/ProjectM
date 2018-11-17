@@ -97,13 +97,23 @@ class Callbacks():
 			else:
 				mBox.showwarning(self.ui.res.pseudoWarningTitle, self.ui.res.pseudoWarningMsg)
 		if dialbox.bodyType == 'changePassword':
-			if len(dialbox.newPasswordStr.get()) >= 4:
-				new_salt = bcrypt.gensalt()
-				while(not self.ui.client.dbcom.checkSalt(new_salt)):
-					new_salt = bcrypt.gensalt()
-				new_password = bcrypt.hashpw(dialbox.newPasswordStr.get().encode(), new_salt)
-				self.ui.client.dbcom.update_password(self.ui.client.username, new_salt, new_password)
-				dialbox.cancel(dialbox)
+			if self.ui.client.dbcom.identify(self.ui.client.username, dialbox.oldPasswordStr.get()):
+				if dialbox.newPasswordStr1.get() == dialbox.newPasswordStr2.get():
+					if len(dialbox.newPasswordStr1.get()) >= 4:
+						new_salt = bcrypt.gensalt()
+						while(not self.ui.client.dbcom.checkSalt(new_salt)):
+							new_salt = bcrypt.gensalt()
+						new_password = bcrypt.hashpw(dialbox.newPasswordStr1.get().encode(), new_salt)
+						self.ui.client.dbcom.update_password(self.ui.client.username, new_salt, new_password)
+						mBox.showinfo(self.ui.res.passwordChanged, self.ui.res.passwordChanged)
+						dialbox.cancel(dialbox)
+					else:
+						dialbox.outputLabel.configure(text=self.ui.res.passwordTooShort, fg='red')
+				else:
+					dialbox.outputLabel.configure(text=self.ui.res.passwordNonIdentical, fg='red')
+			else:
+				dialbox.outputLabel.configure(text=self.ui.res.passwordWrong, fg='red')
+
 		#CONNECT TO SERVER
 		if dialbox.bodyType == 'connect':
 			serverName = dialbox.serverNameEntry.get()
