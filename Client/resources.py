@@ -38,14 +38,28 @@ class Resources():
 		self.done = 'Done'
 		self.cancel = 'Cancel'
 
+		#Profile Menu
 		self.profile = 'Profile'
-		self.personal = 'Personal Informations'
+		self.changePseudo = 'Change Username'
+		self.changePassword = 'Change Password'
+		#Change Dialbox
+		self.newPseudoLabel = 'New Username : '
+		self.oldPseudoLabel = 'Old Username : '
+		self.oldPasswordLabel = 'Old Password : '
+		self.newPasswordLabel = 'New Password : '
+		self.usernameLabel = 'Username : '
+		self.passwordLabel = 'Password : '
+		self.passwordChanged = 'Password changed !'
+		self.pseudoChanged = 'Username Changed !'
+		self.pseudoTaken = 'This Username is already taken.'
+		self.pseudoTooShort = 'Your new Username is too short.'
+		self.passwordTooShort = 'Your new Password is too short.'
+		self.passwordNonIdentical = 'Both new fields must be identical.'
+		self.passwordWrong = 'Wrong Password'
 		#ADD SERVER WINDOW
 		self.serverNameLabel = 'Server Name : '
 		self.adressLabel = 'Server Adress : '
 		self.portLabel = 'Server Port : '
-		#PERSONNAL INFORMATIONS WINDOW
-		self.pseudoLabel = 'Pseudo : '
 		self.helpMenu = 'Help'
 		self.about = 'About'
 		#ERROR OUTPUT
@@ -56,6 +70,8 @@ class Resources():
 		self.mailTaken = 'This Email already exists.\n'
 		self.pseudoWarningTitle = 'Invalid Pseudo Length.'
 		self.pseudoWarningMsg = 'Pseudo must be at least 5 characters length.'
+		self.serverConnectEmptyTitle = 'Connection Failed'
+		self.serverConnectEmptyMsg = 'You did not select any Server.'
 		#DIVERS
 		self.timeFormat = '%H:%M:%S'
 
@@ -106,5 +122,7 @@ class Resources():
 		self.mailTaken = 'Cet Email est déjà utilisé.\n'
 		self.pseudoWarningTitle = 'Longueur de Pseudo invalide'
 		self.pseudoWarningMsg = 'Votre Pseudo doit contenir au moins 5 caractères.'
+		self.serverConnectEmptyTitle = 'Connexion Impossible'
+		self.serverConnectEmptyMsg = 'Vous n\'avez pas selectionné de Serveur.'
 		#DIVERS
 		self.timeFormat = 'De <xxx> à %H:%M:%S :\n\t'

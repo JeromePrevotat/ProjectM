@@ -1,5 +1,6 @@
 import mysql.connector as mysql
 import db_infos
+import bcrypt
 import re
 
 class DBCom():
@@ -19,11 +20,11 @@ class DBCom():
 		cursor.close()
 		conn.close()
 
-	def add_user(self, username, password, email):
+	def add_user(self, username, salt, password, email):
 		conn, cursor = self.connect()
 		self.selectDB(cursor)
 		cursor.execute(
-		"CALL add_user(%s,%s,%s)", (username, password, email)
+		"CALL add_user(%s,%s,%s,%s)", (username, salt, password, email)
 		)
 		conn.commit()
 		self.close(conn, cursor)
@@ -35,7 +36,7 @@ class DBCom():
 		"CALL del_user(%s)", (username,)
 		)
 		conn.commit()
-		self.close()
+		self.close(conn, cursor)
 
 	def update_username(self, old_username, new_username):
 		conn, cursor = self.connect()
@@ -43,17 +44,19 @@ class DBCom():
 		cursor.execute(
 		"CALL update_username(%s,%s)", (old_username, new_username)
 		)
-		cursor.commit()
-		self.close()
+		conn.commit()
+		#cursor.commit()
+		self.close(conn, cursor)
 
-	def update_password(self, username, new_password):
+	def update_password(self, username, new_salt, new_password):
 		conn, cursor = self.connect()
 		self.selectDB(cursor)
 		cursor.execute(
-		"CALL update_password(%s,%s)", (username, new_password)
+		"CALL update_password(%s,%s,%s)", (username, new_salt, new_password)
 		)
-		cursor.commit()
-		self.close()
+		conn.commit()
+		#cursor.commit()
+		self.close(conn, cursor)
 
 	def update_email(self, username, new_mail):
 		conn, cursor = self.connect()
@@ -62,7 +65,7 @@ class DBCom():
 		"CALL update_email(%s,%s)", (username, new_mail)
 		)
 		cursor.commit()
-		self.close()
+		self.close(conn, cursor)
 
 	def identify(self, username, password):
 		conn, cursor = self.connect()
@@ -75,8 +78,12 @@ class DBCom():
 			user_id = queryReturn[0][0]
 		if user_id:
 			cursor.execute(
+			"SELECT salt FROM Users WHERE id = %s", (user_id,))
+			salt = cursor.fetchall()[0][0]
+			cursor.execute(
 			"SELECT password FROM Users WHERE id = %s", (user_id,))
-			if password == cursor.fetchall()[0][0]:
+			testedHash = bcrypt.hashpw(password.encode(), salt.encode())
+			if testedHash.decode() == cursor.fetchall()[0][0]:
 				self.close(conn, cursor)
 				return True
 		self.close(conn, cursor)
@@ -87,6 +94,16 @@ class DBCom():
 		self.selectDB(cursor)
 		cursor.execute(
 		"SELECT username FROM Users"
+		)
+		queryReturn = cursor.fetchall()
+		self.close(conn, cursor)
+		return queryReturn
+
+	def getSaltList(self):
+		conn, cursor = self.connect()
+		self.selectDB(cursor)
+		cursor.execute(
+		"SELECT salt FROM Users"
 		)
 		queryReturn = cursor.fetchall()
 		self.close(conn, cursor)
@@ -117,6 +134,18 @@ class DBCom():
 			if registered == username:
 				self.client.gui.errorLabel.config(text=self.client.gui.errorLabel['text'] +
 				self.client.gui.res.nameTaken)
+				check = False
+		return check
+
+	def checkSalt(self, salt):
+		check = True
+		saltList = self.getSaltList()
+		i = 0
+		for saltTuple in saltList:
+			saltList[i] = saltTuple[0]
+			i += 1
+		for registered in saltList:
+			if registered == salt:
 				check = False
 		return check
 

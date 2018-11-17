@@ -9,6 +9,8 @@ import dialogBox
 import encoding
 from server import Server, getServerList
 
+import bcrypt
+
 class Callbacks():
 	def __init__(self, ui):
 		self.ui = ui
@@ -36,8 +38,11 @@ class Callbacks():
 			self.ui.msgOutput.config(state='disabled')
 		return 'break'
 
-	def profile(self):
-		self.dialBox = dialogBox.Dialog(self.ui, 'personal_informations')
+	def changePseudo(self):
+		self.dialBox = dialogBox.Dialog(self.ui, 'changePseudo')
+
+	def changePassword(self):
+		self.dialBox = dialogBox.Dialog(self.ui, 'changePassword')
 
 	def serverInfos(self):
 		self.dialBox = dialogBox.Dialog(self.ui, 'serverInfos')
@@ -83,34 +88,68 @@ class Callbacks():
 			dialbox.serverNameEntry.config(state='disabled')
 			dialbox.addressEntry.config(state='disabled')
 			dialbox.portEntry.config(state='disabled')
+			dialbox.cancel(dialbox)
 		#PERSONNAL INFORMATIONS
-		if dialbox.bodyType == 'personal_informations':
-			if len(dialbox.pseudoStr.get()) >= 5:
-				self.ui.client.username = dialbox.pseudoStr.get()
+		#PSEUDO CHANGE
+		if dialbox.bodyType == 'changePseudo':
+			if self.ui.client.dbcom.identify(dialbox.oldPseudoStr.get(), dialbox.passwordStr.get()):
+				if len(dialbox.newPseudoStr.get()) >= 4:
+					if self.ui.client.dbcom.checkUsername(dialbox.newPseudoStr.get()):
+						self.ui.client.dbcom.update_username(dialbox.oldPseudoStr.get(), dialbox.newPseudoStr.get())
+						mBox.showinfo(self.ui.res.pseudoChanged, self.ui.res.pseudoChanged)
+						dialbox.cancel(dialbox)
+					else:
+						dialbox.outputLabel.configure(text=self.ui.res.pseudoTaken, fg='red')
+				else:
+					dialbox.outputLabel.configure(text=self.ui.res.pseudoTooShort, fg='red')
 			else:
-				mBox.showwarning(self.ui.res.pseudoWarningTitle, self.ui.res.pseudoWarningMsg)
+				dialbox.outputLabel.configure(text=self.ui.res.badNamePassCombo, fg='red')
+		#PASSWORD CHANGE
+		if dialbox.bodyType == 'changePassword':
+			if self.ui.client.dbcom.identify(dialbox.usernameStr.get(), dialbox.oldPasswordStr.get()):
+				if dialbox.newPasswordStr1.get() == dialbox.newPasswordStr2.get():
+					if len(dialbox.newPasswordStr1.get()) >= 4:
+						new_salt = bcrypt.gensalt()
+						while(not self.ui.client.dbcom.checkSalt(new_salt)):
+							new_salt = bcrypt.gensalt()
+						new_password = bcrypt.hashpw(dialbox.newPasswordStr1.get().encode(), new_salt)
+						self.ui.client.dbcom.update_password(dialbox.usernameStr.get(), new_salt, new_password)
+						mBox.showinfo(self.ui.res.passwordChanged, self.ui.res.passwordChanged)
+						dialbox.cancel(dialbox)
+					else:
+						dialbox.outputLabel.configure(text=self.ui.res.passwordTooShort, fg='red')
+				else:
+					dialbox.outputLabel.configure(text=self.ui.res.passwordNonIdentical, fg='red')
+			else:
+				dialbox.outputLabel.configure(text=self.ui.res.badNamePassCombo, fg='red')
+
 		#CONNECT TO SERVER
 		if dialbox.bodyType == 'connect':
 			serverName = dialbox.serverNameEntry.get()
 			serverAddress = dialbox.addressEntry.get()
 			serverPort = dialbox.portEntry.get()
-			if (serverName is not None and
-			serverAddress is not None and
-			serverPort is not None and
+			if (serverName != "" and
+			serverAddress != "" and
+			serverPort != "" and
 			self.ui.client.username is not None and
 			self.ui.client.username != ''):
 				self.ui.client.server.connectTo(serverName, (serverAddress, int(serverPort)), self.ui.client)
-		dialbox.cancel(dialbox)
+				dialbox.cancel(dialbox)
+			else:
+				mBox.showwarning(self.ui.res.serverConnectEmptyTitle, self.ui.res.serverConnectEmptyMsg)
 
 	def serverConnect(self):
 		self.dialBox = dialogBox.Dialog(self.ui, 'connect')
 
 	def newUser(self):
 		username = self.ui.usernameEntry.get()
-		password = self.ui.passwordEntry.get()
+		salt = bcrypt.gensalt()
+		while(not self.ui.client.dbcom.checkSalt(salt)):
+			salt = bcrypt.gensalt()
+		password = bcrypt.hashpw(self.ui.passwordEntry.get().encode(), salt)
 		email = self.ui.mailEntry.get()
 		if self.ui.client.dbcom.checkUsername(username) and self.ui.client.dbcom.checkMail(email):
-			self.ui.client.dbcom.add_user(username, password, email)
+			self.ui.client.dbcom.add_user(username, salt, password, email)
 			self.ui.buildLogInUI()
 
 	def logIn(self):
