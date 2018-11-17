@@ -38,18 +38,40 @@ class Resources():
 		self.done = 'Done'
 		self.cancel = 'Cancel'
 
+		#Profile Menu
 		self.profile = 'Profile'
-		self.personal = 'Personal Informations'
+		self.changePseudo = 'Change Username'
+		self.changePassword = 'Change Password'
+		#Change Dialbox
+		self.newPseudoLabel = 'New Username : '
+		self.oldPseudoLabel = 'Old Username : '
+		self.oldPasswordLabel = 'Old Password : '
+		self.newPasswordLabel = 'New Password : '
+		self.usernameLabel = 'Username : '
+		self.passwordLabel = 'Password : '
+		self.passwordChanged = 'Password changed !'
+		self.pseudoChanged = 'Username Changed !'
+		self.pseudoTaken = 'This Username is already taken.'
+		self.pseudoTooShort = 'Your new Username is too short.'
+		self.passwordTooShort = 'Your new Password is too short.'
+		self.passwordNonIdentical = 'Both new fields must be identical.'
+		self.passwordWrong = 'Wrong Password'
 		#ADD SERVER WINDOW
 		self.serverNameLabel = 'Server Name : '
 		self.adressLabel = 'Server Adress : '
 		self.portLabel = 'Server Port : '
-		#PERSONNAL INFORMATIONS WINDOW
-		self.pseudoLabel = 'Pseudo : '
-		self.pseudoWarningTitle = 'Invalid Pseudo Length'
-		self.pseudoWarningMsg = 'Pseudo must be at least 5 characters length.'
 		self.helpMenu = 'Help'
 		self.about = 'About'
+		#ERROR OUTPUT
+		self.badNamePassCombo = 'Invalid Username or Password.\n'
+		self.badNameRegex = 'Username must be at least 4 characters length and only contains letters, numbers and "-" and "_".\n'
+		self.nameTaken = 'This Username already exists.\n'
+		self.badMailRegex = 'This Email is not valid.\n'
+		self.mailTaken = 'This Email already exists.\n'
+		self.pseudoWarningTitle = 'Invalid Pseudo Length.'
+		self.pseudoWarningMsg = 'Pseudo must be at least 5 characters length.'
+		self.serverConnectEmptyTitle = 'Connection Failed'
+		self.serverConnectEmptyMsg = 'You did not select any Server.'
 		#DIVERS
 		self.timeFormat = '%H:%M:%S'
 
@@ -90,9 +112,17 @@ class Resources():
 		self.portLabel = 'Server Port : '
 		#PERSONNAL INFORMATIONS WINDOW
 		self.pseudoLabel = 'Pseudo'
-		self.pseudoWarningTitle = 'Longueur de Pseudo invalide'
-		self.pseudoWarningMsg = 'Votre Pseudo doit contenir au moins 5 caractères.'
 		self.helpMenu = 'Aide'
 		self.about = 'À propos'
+		#ERROR OUPUT
+		self.badNamePassCombo = 'Nom d\'utilisateur ou Mot de passe invalide\n'
+		self.badNameRegex = 'Le Nom d\'utilisateur doit contenir au moins 4 caractères et ne contenir que des lettres, chiffres ou "-" et "_" .\n'
+		self.nameTaken = 'Ce Nom d\'utilisateur est déjà utilisé.\n'
+		self.badMailRegex = 'Email incorrect.\n'
+		self.mailTaken = 'Cet Email est déjà utilisé.\n'
+		self.pseudoWarningTitle = 'Longueur de Pseudo invalide'
+		self.pseudoWarningMsg = 'Votre Pseudo doit contenir au moins 5 caractères.'
+		self.serverConnectEmptyTitle = 'Connexion Impossible'
+		self.serverConnectEmptyMsg = 'Vous n\'avez pas selectionné de Serveur.'
 		#DIVERS
 		self.timeFormat = 'De <xxx> à %H:%M:%S :\n\t'

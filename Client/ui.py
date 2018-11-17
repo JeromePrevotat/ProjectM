@@ -1,5 +1,4 @@
 #GUI File
-
 import tkinter as tk
 
 from tkinter import ttk, scrolledtext, Menu
@@ -28,17 +27,20 @@ class Gui():
 		self.root.columnconfigure(0, weight=1)
 
 		#MAIN FRAME
-		self.mainFrame = tk.Frame(self.root)
+		self.mainFrame = tk.Frame(self.root, name='mainFrame')
 		self.mainFrame.grid(row=0, column=0, sticky='NSWE')
 		if not self.client.user.logged :
 			self.buildLogInUI()
 
 	def buildLogInUI(self):
 		#FRAMES
-		self.root.resizable(False, False)
-		self.logInFrame = tk.Frame(self.mainFrame, width=200, height=300)
+		self.mainFrame.columnconfigure(0, weight=1)
+		self.mainFrame.rowconfigure(0, weight=1)
+		self.logInFrame = tk.Frame(self.mainFrame, width=200, height=300, name="logInFrame")
 		self.logInFrame.grid(row=0, column=0, sticky='NSEW')
 		self.logInFrame.grid_propagate(False)
+		self.logInFrame.columnconfigure(0, weight=1)
+		self.logInFrame.rowconfigure((0,1,2), weight=1)
 		self.infosFrame = tk.Frame(self.logInFrame, width=200, height=200)
 		self.infosFrame.columnconfigure(0, weight=1)
 		self.infosFrame.grid(row=0, column=0, sticky='NSEW')
@@ -66,16 +68,23 @@ class Gui():
 		self.errorLabel.grid(row=4, column=0, padx=5)
 		#BUTTONS
 		self.logInButton = tk.Button(self.buttonFrame, text=self.res.logIn, width=8,
-		command=self.callbacks.logIn)
-		self.exitButton = tk.Button(self.buttonFrame, text=self.res.exit, width=8)
-		self.registerButton = tk.Button(self.buttonFrame, text=self.res.register,
-		command=self.buildRegister)
+		name="logInButton", command=self.callbacks.logIn)
+		self.exitButton = tk.Button(self.buttonFrame, text=self.res.exit, width=8,
+		name="exitButton", command=self.callbacks._quit)
+		self.registerButton = tk.Button(self.buttonFrame, text=self.res.register, width=8,
+		name="registerButton", command=self.buildRegister)
 		self.logInButton.grid(row=1, column=0)
 		self.exitButton.grid(row=1, column=1)
-		self.registerButton.grid(row=0, column=0, columnspan=2, sticky='EW')
+		self.registerButton.grid(row=0, column=0, columnspan=2, padx=5)
+
+		#NEW
+		self.logInButton.focus_set()
+		self.mainFrame.bind_all("<Return>", self.callbacks.keyPress_Return)
 
 	def buildRegister(self):
 		self.mail = tk.StringVar()
+		self.usernameEntry.delete(0, tk.END)
+		self.passwordEntry.delete(0, tk.END)
 		self.mailLabel = tk.Label(self.infosFrame, text=self.res.mail, pady=5)
 		self.mailEntry = tk.Entry(self.infosFrame, textvariable=self.mail)
 		self.mailLabel.grid(row=4 ,column=0)
@@ -142,8 +151,13 @@ class Gui():
 		self.menuBar.add_cascade(label=self.res.serverMenu, menu=self.serverMenu)
 		#PROFILE MENU
 		self.profileMenu = Menu(self.menuBar, tearoff=0)
-		self.profileMenu.add_command(label=self.res.personal,
-		command=self.callbacks.profile)
+		#Change Pseudo
+		self.profileMenu.add_command(label=self.res.changePseudo,
+		command=self.callbacks.changePseudo)
+		#Change password
+		self.profileMenu.add_command(label=self.res.changePassword,
+		command=self.callbacks.changePassword)
+		#Change mail
 		self.menuBar.add_cascade(label=self.res.profile, menu=self.profileMenu)
 		#HELP MENU
 		self.helpMenu = Menu(self.menuBar, tearoff=0)

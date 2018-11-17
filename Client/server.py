@@ -7,11 +7,14 @@ import socket
 import tkinter as tk
 from pickle import Pickler, Unpickler
 
+import encoding
+
 class Server():
 	def __init__(self, name=None, address=None, port=None):
 		self.name = name
 		self.address = address
 		self.port = port
+		self.connected = False
 
 	def saveServer(self, absPath=None, saveDir=None, ext=None):
 		if os.path.exists(saveDir) and not os.path.isfile(saveDir):
@@ -31,17 +34,20 @@ class Server():
 		maxConnexionAttempts = 10
 		success = False
 		failed = 0
+		#Client output
 		client.gui.msgOutput.config(state='normal')
 		client.gui.msgOutput.insert(tk.INSERT,
 		'Trying to connect to ' + serverInfos[0] + ':' + str(serverInfos[1]) + '\n')
 		client.gui.msgOutput.config(state='disabled')
-		while not success and failed < maxConnexionAttempts:
+		#Connection Loop
+		while not self.connected and failed < maxConnexionAttempts:
 			try:
 				client.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 				client.socket.connect(serverInfos)
-				success = True
+				self.connected = True
 				client.gui.msgOutput.config(state='normal')
-				client.gui.msgOutput.insert(tk.INSERT, 'Connexion Successful !\n')
+				client.gui.msgOutput.insert(tk.INSERT, 'Connexion Successful !\nWelcome <'
+				+ client.username + '> !\n')
 				client.gui.msgOutput.config(state='disabled')
 			except:
 				client.gui.msgOutput.config(state='normal')
@@ -53,15 +59,18 @@ class Server():
 			client.gui.msgOutput.config(state='normal')
 			client.gui.msgOutput.insert(tk.INSERT, 'Connexion aborted : Too many failed attempts.\n')
 			client.gui.msgOutput.config(state='disabled')
+			return
 		else:
 			self.updateUsername(client.username, client.socket)
-			client.gui.msgInput.bind('<KeyPress - Return>', lambda event : client.gui.callbacks.sendMsg(client.gui))
+			client.gui.msgInput.bind('<KeyPress - Return>',
+			lambda event : client.gui.callbacks.sendMsg(client.gui))
 			client.gui.sendButton.configure(command= lambda : client.gui.callbacks.sendMsg(client.gui))
 			client.threadList.createThread('listenServer')
+			client.threadList.createThread('userList')
 
 	def updateUsername(self, username, socket):
-		update = '?RENAME\n' + username
-		socket.send(update.encode())
+		update = "rename(" + username + ")"
+		socket.send(encoding.encode_cmd(update))
 
 def getServerList(client):
 	serverList = []

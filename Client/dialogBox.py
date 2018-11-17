@@ -42,8 +42,10 @@ class Dialog(tk.Toplevel):
 			self.body = self.buildManageServer()
 		if self.bodyType == 'add_server':
 			self.body = self.buildAddServer()
-		if self.bodyType == 'personal_informations':
-			self.body = self.buildPersonalInformations()
+		if self.bodyType == 'changePseudo':
+			self.body = self.buildChangePseudo()
+		if self.bodyType == 'changePassword':
+			self.body = self.buildChangePassword()
 		if self.bodyType == 'serverInfos':
 			self.body = self.buildServerInfos()
 
@@ -100,6 +102,9 @@ class Dialog(tk.Toplevel):
 		self.doneButton = tk.Button(self.buttonFrame, text=self.ui.res.done,
 		width=10, command=lambda : self.ui.callbacks.done(self))
 		self.doneButton.grid(row=0, column=3)
+		self.cancelButton = tk.Button(self.buttonFrame, text=self.ui.res.cancel,
+		width=10, command= lambda : self.ui.callbacks.cancel(self))
+		self.cancelButton.grid(row=0, column=4)
 
 	def buildServerInfos(self):
 		#SERVER NAME
@@ -124,23 +129,85 @@ class Dialog(tk.Toplevel):
 		width=25, state='disabled')
 		self.portEntry.grid(row=2, column=1)
 
-	def buildPersonalInformations(self):
-		self.pseudoStr = tk.StringVar()
+	def buildChangePseudo(self):
+		#StringVar
+		self.oldPseudoStr = tk.StringVar()
+		self.newPseudoStr = tk.StringVar()
+		self.passwordStr = tk.StringVar()
 		if len(self.ui.client.username) >= 5:
-			self.pseudoStr.set(self.ui.client.username)
-		self.pseudoLabel = tk.Label(self.masterFrame, text=self.ui.res.pseudoLabel)
-		self.pseudoEntry = tk.Entry(self.masterFrame, textvariable=self.pseudoStr,
+			self.oldPseudoStr.set(self.ui.client.username)
+		#Labels & Entry
+		self.oldPseudoLabel = tk.Label(self.masterFrame, text=self.ui.res.oldPseudoLabel)
+		self.oldPseudoEntry = tk.Entry(self.masterFrame, textvariable=self.oldPseudoStr,
 		width=20)
-		self.pseudoLabel.grid(row=0, column=0)
-		self.pseudoEntry.grid(row=0, column=1)
+		self.newPseudoLabel = tk.Label(self.masterFrame, text=self.ui.res.newPseudoLabel)
+		self.newPseudoEntry = tk.Entry(self.masterFrame, textvariable=self.newPseudoStr,
+		width=20)
+		self.passwordLabel = tk.Label(self.masterFrame, text=self.ui.res.passwordLabel)
+		self.passwordEntry = tk.Entry(self.masterFrame, textvariable=self.passwordStr,
+		width=20, show='*')
+		#Grid
+		self.oldPseudoLabel.grid(row=0, column=0)
+		self.oldPseudoEntry.grid(row=0, column=1)
+		self.newPseudoLabel.grid(row=1, column=0)
+		self.newPseudoEntry.grid(row=1, column=1)
+		self.passwordLabel.grid(row=2, column=0)
+		self.passwordEntry.grid(row=2, column=1)
 		self.buttonFrame = tk.Frame(self.masterFrame)
-		self.buttonFrame.grid(row=1, column=1)
+		self.buttonFrame.grid(row=3, column=1)
 		self.buttonDone = tk.Button(self.buttonFrame, text='Done', width=8,
 		command= lambda : self.ui.callbacks.done(self))
 		self.buttonDone.grid(row=1, column=1)
 		self.buttonCancel = tk.Button(self.buttonFrame, text='Cancel', width=8,
 		command= lambda : self.ui.callbacks.cancel(self))
 		self.buttonCancel.grid(row=1, column=0)
+		#Output Frame
+		self.outputFrame = tk.Frame(self.masterFrame)
+		self.outputFrame.grid(row=4, column=0, columnspan=2)
+		self.outputLabel = tk.Label(self.outputFrame, wraplength=190)
+		self.outputLabel.grid(row=0, column=0)
+
+	def buildChangePassword(self):
+		#StringVar
+		self.usernameStr = tk.StringVar()
+		self.oldPasswordStr = tk.StringVar()
+		self.newPasswordStr1 = tk.StringVar()
+		self.newPasswordStr2 = tk.StringVar()
+		#Labels & Entry
+		self.usernameLabel = tk.Label(self.masterFrame, text=self.ui.res.usernameLabel)
+		self.usernameEntry = tk.Entry(self.masterFrame, textvariable=self.usernameStr,
+		width=20)
+		self.oldPasswordLabel = tk.Label(self.masterFrame, text=self.ui.res.oldPasswordLabel)
+		self.oldPasswordEntry = tk.Entry(self.masterFrame, textvariable=self.oldPasswordStr,
+		width=20, show='*')
+		self.newPasswordLabel1 = tk.Label(self.masterFrame, text=self.ui.res.newPasswordLabel)
+		self.newPasswordEntry1 = tk.Entry(self.masterFrame, textvariable=self.newPasswordStr1,
+		width=20, show='*')
+		self.newPasswordLabel2 = tk.Label(self.masterFrame, text=self.ui.res.newPasswordLabel)
+		self.newPasswordEntry2 = tk.Entry(self.masterFrame, textvariable=self.newPasswordStr2,
+		width=20, show='*')
+		self.usernameLabel.grid(row=0, column=0)
+		self.usernameEntry.grid(row=0, column=1)
+		self.oldPasswordLabel.grid(row=1, column=0)
+		self.oldPasswordEntry.grid(row=1, column=1)
+		self.newPasswordLabel1.grid(row=2, column=0)
+		self.newPasswordEntry1.grid(row=2, column=1)
+		self.newPasswordLabel2.grid(row=3, column=0)
+		self.newPasswordEntry2.grid(row=3, column=1)
+		#Buttons
+		self.buttonFrame = tk.Frame(self.masterFrame)
+		self.buttonFrame.grid(row=4, column=1)
+		self.buttonDone = tk.Button(self.buttonFrame, text='Done', width=8,
+		command= lambda : self.ui.callbacks.done(self))
+		self.buttonDone.grid(row=0, column=1)
+		self.buttonCancel = tk.Button(self.buttonFrame, text='Cancel', width=8,
+		command= lambda : self.ui.callbacks.cancel(self))
+		self.buttonCancel.grid(row=0, column=0)
+		#Output Frame
+		self.outputFrame = tk.Frame(self.masterFrame)
+		self.outputFrame.grid(row=5, column=0, columnspan=2)
+		self.outputLabel = tk.Label(self.outputFrame, wraplength=190)
+		self.outputLabel.grid(row=0, column=0)
 
 	def buildConnect(self):
 		self.serverListFrame = tk.Frame(self.masterFrame)
@@ -190,6 +257,7 @@ class Dialog(tk.Toplevel):
 # TO REWRITE                                                                   #
 ################################################################################
 
+	#NOT USED
 	def buttonbox(self):
 		"""Method to create Confirm and Cancel Buttons of the DialogBox."""
 		box = tk.Frame(self)

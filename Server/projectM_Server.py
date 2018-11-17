@@ -5,6 +5,8 @@ import socket
 import select
 import datetime
 
+import encoding
+
 class ProjectM_Server():
 	def __init__(self):
 		self.server_address = ''
@@ -38,6 +40,7 @@ class ProjectM_Server():
 			self.accept_connexion()
 			#Listen to users
 			if self.user_list != []:
+				self.connectionCheck()
 				try:
 					self.to_read, wlist, xlist = select.select([u[0] for u in self.user_list],
 					[], [], 0.05)
@@ -54,6 +57,14 @@ class ProjectM_Server():
 				user[0].close()
 			self.online = False
 
+	def connectionCheck(self):
+		cmd = encoding.encode_cmd("ping()")
+		for user in self.user_list:
+			try:
+				user[0].send(cmd)
+			except:
+				pass
+
 	def accept_connexion(self):
 		"""Accept newly logged users."""
 		if self.new_connexion != []:
@@ -68,29 +79,41 @@ class ProjectM_Server():
 		"""Get users inputs."""
 		for user in self.to_read:
 			try:
-				received = user.recv(1024)
+				received = user.recv(1024).decode()
 			except ConnectionResetError as err:
 				print("Error : " + os.strerror(err.errno))
 				print(user)
 				self.logout_user(user, True)
 			else:
-				if received.decode()[:8] == '?RENAME\n':
-					for u in self.user_list:
-						if u[0] == user:
-							u[2] = received.decode()[8:]
-				elif received.decode() != "" and received.decode() != "\n":
-					src = user
-					for u in self.user_list:
-						if u[0] == src:
-							username = u[2]
-					self.send_msg(received, src, username)
+				#Loop to empty the buffer
+				while (received != ""):
+					cmd, args, msg, length = encoding.parse_type_received(received)
+					#Commands
+					if cmd:
+						if cmd == "rename" and args != "":
+							for u in self.user_list:
+								if u[0] == user:
+									u[2] = args
+						elif cmd == "request":
+							namelist = "request("
+							for u in self.user_list:
+								namelist = namelist + u[2] + '\n'
+							namelist = namelist + ")"
+							user.send(encoding.encode_cmd(namelist))
+					#Messages
+					if not cmd:
+						src = user
+						for u in self.user_list:
+							if u[0] == src:
+								username = u[2]
+						self.send_msg(msg, src, username)
+					received = received[length:]
 
 	def send_msg(self, msg, src, username):
-		fullMsg = 'From ' + username + ' :\n\t' + msg.decode()
-		fullMsg = fullMsg.encode()
+		fullMsg = 'From ' + username + ' :\n\t' + msg
 		for user in self.user_list:
 			if user[0] != src:
-				user[0].send(fullMsg)
+				user[0].send(encoding.encode_msg(fullMsg))
 
 	def logout_user(self, user, forced):
 		"""Logs out from the server the given user and notifies it,
@@ -100,13 +123,13 @@ class ProjectM_Server():
 			i += 1
 		print(str(self.user_list[i][1]) + " logged out. Closing socket.")
 		if not forced:
-			user.send(b"Logout\n")
+			user.send(encoding.encode_msg("Logout\n"))
 		user.close()
-		s = str(self.user_list[i][1]) + " disconnected.\n"
+		s = str(self.user_list[i][2]) + " disconnected.\n"
 		del self.user_list[i]
 		#Broadcast to all users someone disconnected
 		for user in self.user_list:
-			user[0].send(s.encode())
+			user[0].send(encoding.encode_msg(s))
 
 if __name__ == "__main__":
 	pmServer = ProjectM_Server()

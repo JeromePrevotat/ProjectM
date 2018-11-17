@@ -11,18 +11,19 @@ ON ProjectM.* TO 'ProjectMServer'@'localhost' IDENTIFIED BY 'Pr0j3c7M';
 CREATE TABLE Users(
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	username VARCHAR(50) NOT NULL UNIQUE,
-	password VARCHAR(50) NOT NULL,
+	salt VARCHAR(50) NOT NULL UNIQUE,
+	password VARCHAR(100) NOT NULL,
 	email VARCHAR(50) NOT NULL UNIQUE,
 	PRIMARY KEY(id)
 )
 ENGINE=INNODB;
 
 DELIMITER |
-CREATE PROCEDURE add_user (IN username VARCHAR(50), IN password VARCHAR(50), IN email VARCHAR(50))
+CREATE PROCEDURE add_user (IN username VARCHAR(50), IN salt VARCHAR(50), IN password VARCHAR(100), IN email VARCHAR(50))
 SQL SECURITY INVOKER
 BEGIN
-	INSERT INTO Users (username, password, email)
-	VALUES (username, password, email);
+	INSERT INTO Users (username, salt, password, email)
+	VALUES (username, salt, password, email);
 END |
 DELIMITER ;
 
@@ -46,11 +47,11 @@ END |
 DELIMITER ;
 
 DELIMITER |
-CREATE PROCEDURE update_password (IN to_update VARCHAR(50), IN new_password VARCHAR(50))
+CREATE PROCEDURE update_password (IN to_update VARCHAR(50), IN new_salt VARCHAR(50), IN new_password VARCHAR(100))
 SQL SECURITY INVOKER
 BEGIN
 	UPDATE Users
-	SET password = new_password
+	SET password = new_password, salt = new_salt
 	WHERE username = to_update;
 END |
 DELIMITER ;
