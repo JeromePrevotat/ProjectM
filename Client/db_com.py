@@ -44,7 +44,8 @@ class DBCom():
 		cursor.execute(
 		"CALL update_username(%s,%s)", (old_username, new_username)
 		)
-		cursor.commit()
+		conn.commit()
+		#cursor.commit()
 		self.close(conn, cursor)
 
 	def update_password(self, username, new_salt, new_password):

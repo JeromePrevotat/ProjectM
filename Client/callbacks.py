@@ -90,21 +90,30 @@ class Callbacks():
 			dialbox.portEntry.config(state='disabled')
 			dialbox.cancel(dialbox)
 		#PERSONNAL INFORMATIONS
+		#PSEUDO CHANGE
 		if dialbox.bodyType == 'changePseudo':
-			if len(dialbox.pseudoStr.get()) >= 4:
-				self.ui.client.username = dialbox.pseudoStr.get()
-				dialbox.cancel(dialbox)
+			if self.ui.client.dbcom.identify(dialbox.oldPseudoStr.get(), dialbox.passwordStr.get()):
+				if len(dialbox.newPseudoStr.get()) >= 4:
+					if self.ui.client.dbcom.checkUsername(dialbox.newPseudoStr.get()):
+						self.ui.client.dbcom.update_username(dialbox.oldPseudoStr.get(), dialbox.newPseudoStr.get())
+						mBox.showinfo(self.ui.res.pseudoChanged, self.ui.res.pseudoChanged)
+						dialbox.cancel(dialbox)
+					else:
+						dialbox.outputLabel.configure(text=self.ui.res.pseudoTaken, fg='red')
+				else:
+					dialbox.outputLabel.configure(text=self.ui.res.pseudoTooShort, fg='red')
 			else:
-				mBox.showwarning(self.ui.res.pseudoWarningTitle, self.ui.res.pseudoWarningMsg)
+				dialbox.outputLabel.configure(text=self.ui.res.badNamePassCombo, fg='red')
+		#PASSWORD CHANGE
 		if dialbox.bodyType == 'changePassword':
-			if self.ui.client.dbcom.identify(self.ui.client.username, dialbox.oldPasswordStr.get()):
+			if self.ui.client.dbcom.identify(dialbox.usernameStr.get(), dialbox.oldPasswordStr.get()):
 				if dialbox.newPasswordStr1.get() == dialbox.newPasswordStr2.get():
 					if len(dialbox.newPasswordStr1.get()) >= 4:
 						new_salt = bcrypt.gensalt()
 						while(not self.ui.client.dbcom.checkSalt(new_salt)):
 							new_salt = bcrypt.gensalt()
 						new_password = bcrypt.hashpw(dialbox.newPasswordStr1.get().encode(), new_salt)
-						self.ui.client.dbcom.update_password(self.ui.client.username, new_salt, new_password)
+						self.ui.client.dbcom.update_password(dialbox.usernameStr.get(), new_salt, new_password)
 						mBox.showinfo(self.ui.res.passwordChanged, self.ui.res.passwordChanged)
 						dialbox.cancel(dialbox)
 					else:
@@ -112,7 +121,7 @@ class Callbacks():
 				else:
 					dialbox.outputLabel.configure(text=self.ui.res.passwordNonIdentical, fg='red')
 			else:
-				dialbox.outputLabel.configure(text=self.ui.res.passwordWrong, fg='red')
+				dialbox.outputLabel.configure(text=self.ui.res.badNamePassCombo, fg='red')
 
 		#CONNECT TO SERVER
 		if dialbox.bodyType == 'connect':

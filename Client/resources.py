@@ -40,13 +40,19 @@ class Resources():
 
 		#Profile Menu
 		self.profile = 'Profile'
-		self.changePseudo = 'Change Pseudo'
+		self.changePseudo = 'Change Username'
 		self.changePassword = 'Change Password'
 		#Change Dialbox
-		self.changePseudoLabel = 'New Pseudo : '
+		self.newPseudoLabel = 'New Username : '
+		self.oldPseudoLabel = 'Old Username : '
 		self.oldPasswordLabel = 'Old Password : '
 		self.newPasswordLabel = 'New Password : '
+		self.usernameLabel = 'Username : '
+		self.passwordLabel = 'Password : '
 		self.passwordChanged = 'Password changed !'
+		self.pseudoChanged = 'Username Changed !'
+		self.pseudoTaken = 'This Username is already taken.'
+		self.pseudoTooShort = 'Your new Username is too short.'
 		self.passwordTooShort = 'Your new Password is too short.'
 		self.passwordNonIdentical = 'Both new fields must be identical.'
 		self.passwordWrong = 'Wrong Password'
