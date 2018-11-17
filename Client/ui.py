@@ -151,8 +151,13 @@ class Gui():
 		self.menuBar.add_cascade(label=self.res.serverMenu, menu=self.serverMenu)
 		#PROFILE MENU
 		self.profileMenu = Menu(self.menuBar, tearoff=0)
-		self.profileMenu.add_command(label=self.res.personal,
-		command=self.callbacks.profile)
+		#Change Pseudo
+		self.profileMenu.add_command(label=self.res.changePseudo,
+		command=self.callbacks.changePseudo)
+		#Change password
+		self.profileMenu.add_command(label=self.res.changePassword,
+		command=self.callbacks.changePassword)
+		#Change mail
 		self.menuBar.add_cascade(label=self.res.profile, menu=self.profileMenu)
 		#HELP MENU
 		self.helpMenu = Menu(self.menuBar, tearoff=0)

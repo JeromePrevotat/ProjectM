@@ -38,8 +38,11 @@ class Callbacks():
 			self.ui.msgOutput.config(state='disabled')
 		return 'break'
 
-	def profile(self):
-		self.dialBox = dialogBox.Dialog(self.ui, 'personal_informations')
+	def changePseudo(self):
+		self.dialBox = dialogBox.Dialog(self.ui, 'changePseudo')
+
+	def changePassword(self):
+		self.dialBox = dialogBox.Dialog(self.ui, 'changePassword')
 
 	def serverInfos(self):
 		self.dialBox = dialogBox.Dialog(self.ui, 'serverInfos')
@@ -87,12 +90,20 @@ class Callbacks():
 			dialbox.portEntry.config(state='disabled')
 			dialbox.cancel(dialbox)
 		#PERSONNAL INFORMATIONS
-		if dialbox.bodyType == 'personal_informations':
-			if len(dialbox.pseudoStr.get()) >= 5:
+		if dialbox.bodyType == 'changePseudo':
+			if len(dialbox.pseudoStr.get()) >= 4:
 				self.ui.client.username = dialbox.pseudoStr.get()
 				dialbox.cancel(dialbox)
 			else:
 				mBox.showwarning(self.ui.res.pseudoWarningTitle, self.ui.res.pseudoWarningMsg)
+		if dialbox.bodyType == 'changePassword':
+			if len(dialbox.newPasswordStr.get()) >= 4:
+				new_salt = bcrypt.gensalt()
+				while(not self.ui.client.dbcom.checkSalt(new_salt)):
+					new_salt = bcrypt.gensalt()
+				new_password = bcrypt.hashpw(dialbox.newPasswordStr.get().encode(), new_salt)
+				self.ui.client.dbcom.update_password(self.ui.client.username, new_salt, new_password)
+				dialbox.cancel(dialbox)
 		#CONNECT TO SERVER
 		if dialbox.bodyType == 'connect':
 			serverName = dialbox.serverNameEntry.get()

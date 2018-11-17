@@ -38,14 +38,18 @@ class Resources():
 		self.done = 'Done'
 		self.cancel = 'Cancel'
 
+		#Profile Menu
 		self.profile = 'Profile'
-		self.personal = 'Personal Informations'
+		self.changePseudo = 'Change Pseudo'
+		self.changePassword = 'Change Password'
+		#Change Dialbox
+		self.changePseudoLabel = 'New Pseudo : '
+		self.newPasswordLabel = 'New Password : '
 		#ADD SERVER WINDOW
 		self.serverNameLabel = 'Server Name : '
 		self.adressLabel = 'Server Adress : '
 		self.portLabel = 'Server Port : '
-		#PERSONNAL INFORMATIONS WINDOW
-		self.pseudoLabel = 'Pseudo : '
+
 		self.helpMenu = 'Help'
 		self.about = 'About'
 		#ERROR OUTPUT

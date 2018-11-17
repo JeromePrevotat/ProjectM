@@ -42,8 +42,10 @@ class Dialog(tk.Toplevel):
 			self.body = self.buildManageServer()
 		if self.bodyType == 'add_server':
 			self.body = self.buildAddServer()
-		if self.bodyType == 'personal_informations':
-			self.body = self.buildPersonalInformations()
+		if self.bodyType == 'changePseudo':
+			self.body = self.buildChangePseudo()
+		if self.bodyType == 'changePassword':
+			self.body = self.buildChangePassword()
 		if self.bodyType == 'serverInfos':
 			self.body = self.buildServerInfos()
 
@@ -127,15 +129,31 @@ class Dialog(tk.Toplevel):
 		width=25, state='disabled')
 		self.portEntry.grid(row=2, column=1)
 
-	def buildPersonalInformations(self):
+	def buildChangePseudo(self):
 		self.pseudoStr = tk.StringVar()
 		if len(self.ui.client.username) >= 5:
 			self.pseudoStr.set(self.ui.client.username)
-		self.pseudoLabel = tk.Label(self.masterFrame, text=self.ui.res.pseudoLabel)
+		self.pseudoLabel = tk.Label(self.masterFrame, text=self.ui.res.changePseudoLabel)
 		self.pseudoEntry = tk.Entry(self.masterFrame, textvariable=self.pseudoStr,
 		width=20)
 		self.pseudoLabel.grid(row=0, column=0)
 		self.pseudoEntry.grid(row=0, column=1)
+		self.buttonFrame = tk.Frame(self.masterFrame)
+		self.buttonFrame.grid(row=1, column=1)
+		self.buttonDone = tk.Button(self.buttonFrame, text='Done', width=8,
+		command= lambda : self.ui.callbacks.done(self))
+		self.buttonDone.grid(row=1, column=1)
+		self.buttonCancel = tk.Button(self.buttonFrame, text='Cancel', width=8,
+		command= lambda : self.ui.callbacks.cancel(self))
+		self.buttonCancel.grid(row=1, column=0)
+
+	def buildChangePassword(self):
+		self.newPasswordStr = tk.StringVar()
+		self.newPasswordLabel = tk.Label(self.masterFrame, text=self.ui.res.newPasswordLabel)
+		self.passwordEntry = tk.Entry(self.masterFrame, textvariable=self.newPasswordStr,
+		width=20, show='*')
+		self.newPasswordLabel.grid(row=0, column=0)
+		self.passwordEntry.grid(row=0, column=1)
 		self.buttonFrame = tk.Frame(self.masterFrame)
 		self.buttonFrame.grid(row=1, column=1)
 		self.buttonDone = tk.Button(self.buttonFrame, text='Done', width=8,

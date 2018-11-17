@@ -47,11 +47,11 @@ END |
 DELIMITER ;
 
 DELIMITER |
-CREATE PROCEDURE update_password (IN to_update VARCHAR(50), IN new_password VARCHAR(100))
+CREATE PROCEDURE update_password (IN to_update VARCHAR(50), IN new_salt VARCHAR(50), IN new_password VARCHAR(100))
 SQL SECURITY INVOKER
 BEGIN
 	UPDATE Users
-	SET password = new_password
+	SET password = new_password, salt = new_salt
 	WHERE username = to_update;
 END |
 DELIMITER ;

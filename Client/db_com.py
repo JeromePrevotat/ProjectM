@@ -36,7 +36,7 @@ class DBCom():
 		"CALL del_user(%s)", (username,)
 		)
 		conn.commit()
-		self.close()
+		self.close(conn, cursor)
 
 	def update_username(self, old_username, new_username):
 		conn, cursor = self.connect()
@@ -45,16 +45,17 @@ class DBCom():
 		"CALL update_username(%s,%s)", (old_username, new_username)
 		)
 		cursor.commit()
-		self.close()
+		self.close(conn, cursor)
 
-	def update_password(self, username, new_password):
+	def update_password(self, username, new_salt, new_password):
 		conn, cursor = self.connect()
 		self.selectDB(cursor)
 		cursor.execute(
-		"CALL update_password(%s,%s)", (username, new_password)
+		"CALL update_password(%s,%s,%s)", (username, new_salt, new_password)
 		)
-		cursor.commit()
-		self.close()
+		conn.commit()
+		#cursor.commit()
+		self.close(conn, cursor)
 
 	def update_email(self, username, new_mail):
 		conn, cursor = self.connect()
@@ -63,7 +64,7 @@ class DBCom():
 		"CALL update_email(%s,%s)", (username, new_mail)
 		)
 		cursor.commit()
-		self.close()
+		self.close(conn, cursor)
 
 	def identify(self, username, password):
 		conn, cursor = self.connect()
@@ -143,7 +144,6 @@ class DBCom():
 			saltList[i] = saltTuple[0]
 			i += 1
 		for registered in saltList:
-			print(registered)
 			if registered == salt:
 				check = False
 		return check
