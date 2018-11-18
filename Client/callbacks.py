@@ -11,6 +11,8 @@ from server import Server, getServerList
 
 import bcrypt
 
+import smsCode
+
 class Callbacks():
 	def __init__(self, ui):
 		self.ui = ui
@@ -140,6 +142,38 @@ class Callbacks():
 
 	def serverConnect(self):
 		self.dialBox = dialogBox.Dialog(self.ui, 'connect')
+
+	def askCode(self):
+		"""Send then Ask the user for the Confirmation Code sent by SMS."""
+		#Send the Confirmation Code
+		correctCode = smsCode.sendCode(self.ui.numberStr.get())
+		#Clean the UI
+		self.ui.usernameLabel.grid_remove()
+		self.ui.usernameEntry.grid_remove()
+		self.ui.passwordLabel.grid_remove()
+		self.ui.passwordEntry.grid_remove()
+		self.ui.mailLabel.grid_remove()
+		self.ui.mailEntry.grid_remove()
+		self.ui.numberLabel.grid_remove()
+		self.ui.numberEntry.grid_remove()
+		#Confirmation Code Field
+		self.ui.confirmationCodeStr = tk.StringVar()
+		self.ui.confirmatioCodeLabel = tk.Label(self.ui.infosFrame, text=self.ui.res.confirmationCode, pady=5)
+		self.ui.confirmationCodeEntry = tk.Entry(self.ui.infosFrame, textvariable=self.ui.confirmationCodeStr)
+		self.ui.confirmatioCodeLabel.grid(row=0, column=0)
+		self.ui.confirmationCodeEntry.grid(row=1, column=0)
+		#Output Label
+		self.ui.outputLabel = tk.Label(self.ui.infosFrame)
+		self.ui.outputLabel.grid(row=2, column=0)
+		#Confirm command
+		self.ui.logInButton.config(text=self.ui.res.done,
+		command= lambda : self.confirmCode(correctCode))
+
+	def confirmCode(self, correctCode):
+		if self.ui.confirmationCodeStr.get() == correctCode:
+			self.newUser()
+		else:
+			self.ui.outputLabel.configure(text='Wrong Code',fg='red')
 
 	def newUser(self):
 		username = self.ui.usernameEntry.get()
