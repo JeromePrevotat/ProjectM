@@ -143,6 +143,13 @@ class Callbacks():
 	def serverConnect(self):
 		self.dialBox = dialogBox.Dialog(self.ui, 'connect')
 
+	def checkEntry(self):
+		"""Check if the Entries content obey certain Regex."""
+		if self.ui.client.dbcom.checkUsername(self.ui.usernameEntry.get()) \
+			and self.ui.client.dbcom.checkMail(self.ui.mailEntry.get()) \
+			and self.ui.client.dbcom.checkPhoneNumber(self.ui.numberEntry.get()):
+			self.askCode()
+
 	def askCode(self):
 		"""Send then Ask the user for the Confirmation Code sent by SMS."""
 		#Send the Confirmation Code
@@ -182,9 +189,9 @@ class Callbacks():
 			salt = bcrypt.gensalt()
 		password = bcrypt.hashpw(self.ui.passwordEntry.get().encode(), salt)
 		email = self.ui.mailEntry.get()
-		if self.ui.client.dbcom.checkUsername(username) and self.ui.client.dbcom.checkMail(email):
-			self.ui.client.dbcom.add_user(username, salt, password, email)
-			self.ui.buildLogInUI()
+		phoneNumber = self.ui.numberEntry.get()
+		self.ui.client.dbcom.add_user(username, salt, password, email, phoneNumber)
+		self.ui.buildLogInUI()
 
 	def logIn(self):
 		username = self.ui.usernameEntry.get()

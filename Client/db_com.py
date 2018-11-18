@@ -20,11 +20,11 @@ class DBCom():
 		cursor.close()
 		conn.close()
 
-	def add_user(self, username, salt, password, email):
+	def add_user(self, username, salt, password, email, phoneNumber):
 		conn, cursor = self.connect()
 		self.selectDB(cursor)
 		cursor.execute(
-		"CALL add_user(%s,%s,%s,%s)", (username, salt, password, email)
+		"CALL add_user(%s,%s,%s,%s,%s)", (username, salt, password, email, phoneNumber)
 		)
 		conn.commit()
 		self.close(conn, cursor)
@@ -119,7 +119,18 @@ class DBCom():
 		self.close(conn, cursor)
 		return queryReturn
 
+	def getPhoneNumberList(self):
+		conn, cursor = self.connect()
+		self.selectDB(cursor)
+		cursor.execute(
+		"SELECT phoneNumber FROM Users"
+		)
+		queryReturn = cursor.fetchall()
+		self.close(conn, cursor)
+		return queryReturn
+
 	def checkUsername(self, username):
+		self.client.gui.errorLabel.config(text='')
 		check = True
 		usernameList = self.getUsernameList()
 		i = 0
@@ -150,6 +161,7 @@ class DBCom():
 		return check
 
 	def checkMail(self, email):
+		self.client.gui.errorLabel.config(text='')
 		check = True
 		emailList = self.getMailList()
 		i = 0
@@ -164,5 +176,24 @@ class DBCom():
 			if registered == email:
 				self.client.gui.errorLabel.config(text=self.client.gui.errorLabel['text'] +
 				self.client.gui.res.mailTaken)
+				check = False
+		return check
+
+	def checkPhoneNumber(self, phoneNumber):
+		self.client.gui.errorLabel.config(text='')
+		check = True
+		phoneNumberList = self.getPhoneNumberList()
+		i = 0
+		for phoneNumberTuple in phoneNumberList:
+			phoneNumberList[i] = phoneNumberTuple[0]
+			i += 1
+		if not re.search(r"^\+{1}[0-9]{2}[0-9]{9}$", phoneNumber):
+			self.client.gui.errorLabel.config(text=self.client.gui.errorLabel['text'] +
+			self.client.gui.res.badPhoneNumberRegex)
+			check = False
+		for registered in phoneNumberList:
+			if registered == phoneNumber:
+				self.client.gui.errorLabel.config(text=self.client.gui.errorLabel['text'] +
+				self.client.gui.res.phoneNumberTaken)
 				check = False
 		return check

@@ -36,7 +36,7 @@ class Gui():
 		#FRAMES
 		self.mainFrame.columnconfigure(0, weight=1)
 		self.mainFrame.rowconfigure(0, weight=1)
-		self.logInFrame = tk.Frame(self.mainFrame, width=200, height=375, name="logInFrame")
+		self.logInFrame = tk.Frame(self.mainFrame, width=300, height=450, name="logInFrame")
 		self.logInFrame.grid(row=0, column=0, sticky='NSEW')
 		self.logInFrame.grid_propagate(False)
 		self.logInFrame.columnconfigure(0, weight=1)
@@ -97,12 +97,14 @@ class Gui():
 		self.numberEntry.grid(row=7, column=0)
 		#End number Field
 		self.registerButton.grid_remove()
+		#REGISTER MODE
 		#Ask for the confirmation sent via sms
 		self.logInButton.config(text=self.res.done,
-		command=self.callbacks.askCode)
+		command=self.callbacks.checkEntry)
 		#Create the new user in the DB
 		#self.logInButton.config(text=self.res.done,
 		#command=self.callbacks.newUser)
+		#Exit Button
 		self.exitButton.config(text=self.res.cancel,
 		command=self.buildLogInUI)
 
