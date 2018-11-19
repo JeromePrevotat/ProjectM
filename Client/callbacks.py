@@ -1,17 +1,18 @@
 #CALLBACKS COMMANDS FILE
 
 import tkinter as tk
-import timeformat as tFormat
-
 from tkinter import ttk, messagebox as mBox
-
-import dialogBox
-import encoding
-from server import Server, getServerList
 
 import bcrypt
 
+
+from server import Server, getServerList
+
+import timeformat as tFormat
+import dialogBox
+import encoding
 import smsCode
+
 
 class Callbacks():
 	def __init__(self, ui):
@@ -53,11 +54,13 @@ class Callbacks():
 		self.dialBox = dialogBox.Dialog(self.ui, 'manageServer')
 
 	def add(self, dialbox):
+		print('ADD CALLBACK')
 		dialbox.serverNameEntry.config(state='normal')
 		dialbox.addressEntry.config(state='normal')
 		dialbox.portEntry.config(state='normal')
 
 	def edit(self, dialbox):
+		print('EDIT CALLBACK')
 		dialbox.serverNameEntry.config(state='normal')
 		dialbox.addressEntry.config(state='normal')
 		dialbox.portEntry.config(state='normal')

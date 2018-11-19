@@ -21,6 +21,7 @@ class Resources():
 		self.mail = 'E-Mail'
 		self.number = 'Phone Number'
 		self.confirmationCode = 'Confirmation Code'
+		self.confirmationSms = 'Your ProjectM Confirmation Code is : '
 		#MAIN UI
 		#FRAMES
 		self.userListLabel = ' Online Users '

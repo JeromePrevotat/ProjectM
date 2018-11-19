@@ -25,7 +25,6 @@ class Gui():
 		self.root.after_idle(self.root.attributes, '-topmost', False)
 		self.root.rowconfigure(0, weight=1)
 		self.root.columnconfigure(0, weight=1)
-
 		#MAIN FRAME
 		self.mainFrame = tk.Frame(self.root, name='mainFrame')
 		self.mainFrame.grid(row=0, column=0, sticky='NSWE')
@@ -76,8 +75,7 @@ class Gui():
 		self.logInButton.grid(row=1, column=0)
 		self.exitButton.grid(row=1, column=1)
 		self.registerButton.grid(row=0, column=0, columnspan=2, padx=5)
-
-		#NEW
+		#Set Keypress Return default behaviour to Done
 		self.logInButton.focus_set()
 		self.mainFrame.bind_all("<Return>", self.callbacks.keyPress_Return)
 

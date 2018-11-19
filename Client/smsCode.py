@@ -1,5 +1,6 @@
 from twilio.rest import Client
 
+import resources
 import random
 
 def logToTwilio():
@@ -9,17 +10,15 @@ def logToTwilio():
 	return client
 
 def sendCode(number):
-	if number == '+33669019971':
-		client = logToTwilio()
-		numberToSend = number
-		codeToSend = generateCode()
-		message = client.messages.create( \
-			body='Your ProjectM Confirmation Code is : ' + codeToSend, \
-			from_='+33644601488', \
-			to=numberToSend \
-			)
-	else:
-		print('WRONG NUMBER')
+	res = resources.Resources('en')
+	client = logToTwilio()
+	numberToSend = number
+	codeToSend = generateCode()
+	message = client.messages.create( \
+		body = res.confirmationSms + codeToSend, \
+		from_ = '+33644601488', \
+		to = numberToSend \
+		)
 	return codeToSend
 
 def generateCode():
