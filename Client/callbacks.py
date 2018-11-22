@@ -1,15 +1,18 @@
 #CALLBACKS COMMANDS FILE
 
 import tkinter as tk
-import timeformat as tFormat
-
 from tkinter import ttk, messagebox as mBox
 
-import dialogBox
-import encoding
+import bcrypt
+
+
 from server import Server, getServerList
 
-import bcrypt
+import timeformat as tFormat
+import dialogBox
+import encoding
+import smsCode
+
 
 class Callbacks():
 	def __init__(self, ui):
@@ -51,11 +54,13 @@ class Callbacks():
 		self.dialBox = dialogBox.Dialog(self.ui, 'manageServer')
 
 	def add(self, dialbox):
+		print('ADD CALLBACK')
 		dialbox.serverNameEntry.config(state='normal')
 		dialbox.addressEntry.config(state='normal')
 		dialbox.portEntry.config(state='normal')
 
 	def edit(self, dialbox):
+		print('EDIT CALLBACK')
 		dialbox.serverNameEntry.config(state='normal')
 		dialbox.addressEntry.config(state='normal')
 		dialbox.portEntry.config(state='normal')
@@ -141,6 +146,45 @@ class Callbacks():
 	def serverConnect(self):
 		self.dialBox = dialogBox.Dialog(self.ui, 'connect')
 
+	def checkEntry(self):
+		"""Check if the Entries content obey certain Regex."""
+		if self.ui.client.dbcom.checkUsername(self.ui.usernameEntry.get()) \
+			and self.ui.client.dbcom.checkMail(self.ui.mailEntry.get()) \
+			and self.ui.client.dbcom.checkPhoneNumber(self.ui.numberEntry.get()):
+			self.askCode()
+
+	def askCode(self):
+		"""Send then Ask the user for the Confirmation Code sent by SMS."""
+		#Send the Confirmation Code
+		correctCode = smsCode.sendCode(self.ui.numberStr.get())
+		#Clean the UI
+		self.ui.usernameLabel.grid_remove()
+		self.ui.usernameEntry.grid_remove()
+		self.ui.passwordLabel.grid_remove()
+		self.ui.passwordEntry.grid_remove()
+		self.ui.mailLabel.grid_remove()
+		self.ui.mailEntry.grid_remove()
+		self.ui.numberLabel.grid_remove()
+		self.ui.numberEntry.grid_remove()
+		#Confirmation Code Field
+		self.ui.confirmationCodeStr = tk.StringVar()
+		self.ui.confirmatioCodeLabel = tk.Label(self.ui.infosFrame, text=self.ui.res.confirmationCode, pady=5)
+		self.ui.confirmationCodeEntry = tk.Entry(self.ui.infosFrame, textvariable=self.ui.confirmationCodeStr)
+		self.ui.confirmatioCodeLabel.grid(row=0, column=0)
+		self.ui.confirmationCodeEntry.grid(row=1, column=0)
+		#Output Label
+		self.ui.outputLabel = tk.Label(self.ui.infosFrame)
+		self.ui.outputLabel.grid(row=2, column=0)
+		#Confirm command
+		self.ui.logInButton.config(text=self.ui.res.done,
+		command= lambda : self.confirmCode(correctCode))
+
+	def confirmCode(self, correctCode):
+		if self.ui.confirmationCodeStr.get() == correctCode:
+			self.newUser()
+		else:
+			self.ui.outputLabel.configure(text='Wrong Code',fg='red')
+
 	def newUser(self):
 		username = self.ui.usernameEntry.get()
 		salt = bcrypt.gensalt()
@@ -148,9 +192,9 @@ class Callbacks():
 			salt = bcrypt.gensalt()
 		password = bcrypt.hashpw(self.ui.passwordEntry.get().encode(), salt)
 		email = self.ui.mailEntry.get()
-		if self.ui.client.dbcom.checkUsername(username) and self.ui.client.dbcom.checkMail(email):
-			self.ui.client.dbcom.add_user(username, salt, password, email)
-			self.ui.buildLogInUI()
+		phoneNumber = self.ui.numberEntry.get()
+		self.ui.client.dbcom.add_user(username, salt, password, email, phoneNumber)
+		self.ui.buildLogInUI()
 
 	def logIn(self):
 		username = self.ui.usernameEntry.get()

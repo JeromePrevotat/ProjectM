@@ -25,7 +25,6 @@ class Gui():
 		self.root.after_idle(self.root.attributes, '-topmost', False)
 		self.root.rowconfigure(0, weight=1)
 		self.root.columnconfigure(0, weight=1)
-
 		#MAIN FRAME
 		self.mainFrame = tk.Frame(self.root, name='mainFrame')
 		self.mainFrame.grid(row=0, column=0, sticky='NSWE')
@@ -36,7 +35,7 @@ class Gui():
 		#FRAMES
 		self.mainFrame.columnconfigure(0, weight=1)
 		self.mainFrame.rowconfigure(0, weight=1)
-		self.logInFrame = tk.Frame(self.mainFrame, width=200, height=300, name="logInFrame")
+		self.logInFrame = tk.Frame(self.mainFrame, width=300, height=450, name="logInFrame")
 		self.logInFrame.grid(row=0, column=0, sticky='NSEW')
 		self.logInFrame.grid_propagate(False)
 		self.logInFrame.columnconfigure(0, weight=1)
@@ -47,7 +46,7 @@ class Gui():
 		self.infosFrame.grid_propagate(False)
 		self.errorFrame = tk.Frame(self.logInFrame)
 		self.errorFrame.grid(row=1,column=0)
-		self.buttonFrame = tk.Frame(self.logInFrame, width=200, height=100)
+		self.buttonFrame = tk.Frame(self.logInFrame, width=200, height=50)
 		self.buttonFrame.columnconfigure((0,1), weight=1)
 		self.buttonFrame.grid(row=2, column=0, sticky='NSEW')
 		self.buttonFrame.grid_propagate(False)
@@ -76,8 +75,7 @@ class Gui():
 		self.logInButton.grid(row=1, column=0)
 		self.exitButton.grid(row=1, column=1)
 		self.registerButton.grid(row=0, column=0, columnspan=2, padx=5)
-
-		#NEW
+		#Set Keypress Return default behaviour to Done
 		self.logInButton.focus_set()
 		self.mainFrame.bind_all("<Return>", self.callbacks.keyPress_Return)
 
@@ -89,11 +87,24 @@ class Gui():
 		self.mailEntry = tk.Entry(self.infosFrame, textvariable=self.mail)
 		self.mailLabel.grid(row=4 ,column=0)
 		self.mailEntry.grid(row=5, column=0)
+		#Number Field
+		self.numberStr = tk.StringVar()
+		self.numberLabel = tk.Label(self.infosFrame, text=self.res.number, pady=5)
+		self.numberEntry = tk.Entry(self.infosFrame, textvariable=self.numberStr)
+		self.numberLabel.grid(row=6, column=0)
+		self.numberEntry.grid(row=7, column=0)
+		#End number Field
 		self.registerButton.grid_remove()
+		#REGISTER MODE
+		#Ask for the confirmation sent via sms
 		self.logInButton.config(text=self.res.done,
-		command=self.callbacks.newUser)
+		command=self.callbacks.checkEntry)
+		#Create the new user in the DB
+		#self.logInButton.config(text=self.res.done,
+		#command=self.callbacks.newUser)
+		#Exit Button
 		self.exitButton.config(text=self.res.cancel,
-		command = self.buildLogInUI)
+		command=self.buildLogInUI)
 
 	def buildMainUI(self):
 		self.mainFrame.rowconfigure(0, weight=1)

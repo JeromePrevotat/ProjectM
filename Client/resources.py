@@ -19,6 +19,9 @@ class Resources():
 		self.register = 'Register'
 		#REGISTER UI
 		self.mail = 'E-Mail'
+		self.number = 'Phone Number'
+		self.confirmationCode = 'Confirmation Code'
+		self.confirmationSms = 'Your ProjectM Confirmation Code is : '
 		#MAIN UI
 		#FRAMES
 		self.userListLabel = ' Online Users '
@@ -68,6 +71,8 @@ class Resources():
 		self.nameTaken = 'This Username already exists.\n'
 		self.badMailRegex = 'This Email is not valid.\n'
 		self.mailTaken = 'This Email already exists.\n'
+		self.badPhoneNumberRegex = 'This is not a valid phone number. Format must be : +(ind)(number)\n'
+		self.phoneNumberTaken = 'This Phone Number is already in use.'
 		self.pseudoWarningTitle = 'Invalid Pseudo Length.'
 		self.pseudoWarningMsg = 'Pseudo must be at least 5 characters length.'
 		self.serverConnectEmptyTitle = 'Connection Failed'

@@ -14,16 +14,17 @@ CREATE TABLE Users(
 	salt VARCHAR(50) NOT NULL UNIQUE,
 	password VARCHAR(100) NOT NULL,
 	email VARCHAR(50) NOT NULL UNIQUE,
+	phoneNumber VARCHAR(15) NOT NULL UNIQUE,
 	PRIMARY KEY(id)
 )
 ENGINE=INNODB;
 
 DELIMITER |
-CREATE PROCEDURE add_user (IN username VARCHAR(50), IN salt VARCHAR(50), IN password VARCHAR(100), IN email VARCHAR(50))
+CREATE PROCEDURE add_user (IN username VARCHAR(50), IN salt VARCHAR(50), IN password VARCHAR(100), IN email VARCHAR(50), IN phoneNumber VARCHAR(15))
 SQL SECURITY INVOKER
 BEGIN
-	INSERT INTO Users (username, salt, password, email)
-	VALUES (username, salt, password, email);
+	INSERT INTO Users (username, salt, password, email, phoneNumber)
+	VALUES (username, salt, password, email, phoneNumber);
 END |
 DELIMITER ;
 
@@ -62,6 +63,16 @@ SQL SECURITY INVOKER
 BEGIN
 	UPDATE Users
 	SET email = new_mail
+	WHERE username = to_update;
+END |
+DELIMITER ;
+
+DELIMITER |
+CREATE PROCEDURE update_phoneNumber (IN to_update VARCHAR(50), IN new_phoneNumber VARCHAR(15))
+SQL SECURITY INVOKER
+BEGIN
+	UPDATE Users
+	SET phoneNumber = new_phoneNumber
 	WHERE username = to_update;
 END |
 DELIMITER ;
