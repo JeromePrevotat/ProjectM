@@ -1,4 +1,4 @@
-"""Client Module"""
+"""Client Module."""
 
 import os
 import sys
