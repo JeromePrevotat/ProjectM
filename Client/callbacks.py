@@ -1,206 +1,236 @@
-#CALLBACKS COMMANDS FILE
+"""Callbacks Buttons Commands"""
 
 import tkinter as tk
-from tkinter import ttk, messagebox as mBox
+from tkinter import messagebox as mBox
 
 import bcrypt
 
 
-from server import Server, getServerList
+from server import Server
 
 import timeformat as tFormat
-import dialogBox
+import dialogbox
 import encoding
-import smsCode
+import sms_code
 
 
 class Callbacks():
-	def __init__(self, ui):
-		self.ui = ui
+    """"Callbacks Buttons Commands Class."""
 
-	def _quit(self):
-		self.ui.root.quit()
-		self.ui.root.destroy()
-		exit()
+    def __init__(self, ui):
+        self.gui = ui
+        self.dialbox = None
 
-	def keyPress_Return(self, _event=None):
-		if (type(self.ui.mainFrame.focus_get()) == tk.Button
-		and self.ui.mainFrame.focus_get().config()['command'] != ''):
-			self.ui.mainFrame.focus_get().invoke()
-		else:
-			self.ui.logInButton.invoke()
+    def _quit(self):
+        """Quit Command."""
+        self.gui.root.quit()
+        self.gui.root.destroy()
+        exit()
 
-	def sendMsg(self, ui):
-		msg = ui.msgInput.get(1.0, tk.END)
-		if msg != '' and msg != '\n':
-			encoded_msg = encoding.encode_msg(msg)
-			ui.client.socket.send(encoded_msg)
-			ui.msgInput.delete(1.0, tk.END)
-			self.ui.msgOutput.config(state='normal')
-			self.ui.msgOutput.insert(tk.INSERT,'You at ' + tFormat.get_time_format(self.ui) + ' :\n\t' + msg + '\n')
-			self.ui.msgOutput.config(state='disabled')
-		return 'break'
+    def key_press_return(self, _event=None):
+        """Default behaviour of Keypress Return."""
+        if (isinstance(self.gui.main_frame.focus_get(), tk.Button) and \
+        self.gui.main_frame.focus_get().config()['command'] != ''):
+            self.gui.main_frame.focus_get().invoke()
+        else:
+            self.gui.log_in_button.invoke()
 
-	def changePseudo(self):
-		self.dialBox = dialogBox.Dialog(self.ui, 'changePseudo')
+    def send_msg(self, gui):
+        """Send a Message."""
+        msg = gui.msg_input.get(1.0, tk.END)
+        if msg not in ['', '\n']:
+            encoded_msg = encoding.encode_msg(msg)
+            gui.client.socket.send(encoded_msg)
+            gui.msg_input.delete(1.0, tk.END)
+            self.gui.msg_output.config(state='normal')
+            self.gui.msg_output.insert(tk.INSERT, 'You at ' + \
+            tFormat.get_time_format(self.gui) + ' :\n\t' + msg + '\n')
+            self.gui.msg_output.config(state='disabled')
+        return 'break'
 
-	def changePassword(self):
-		self.dialBox = dialogBox.Dialog(self.ui, 'changePassword')
+    def change_pseudo(self):
+        """Creates a Dialbox allowing to change the use Username."""
+        self.dialbox = dialogbox.Dialog(self.gui, 'change_pseudo')
 
-	def serverInfos(self):
-		self.dialBox = dialogBox.Dialog(self.ui, 'serverInfos')
+    def change_password(self):
+        """Creates a Dialbox allowing to change the user Password."""
+        self.dialbox = dialogbox.Dialog(self.gui, 'change_password')
 
-	def manageServer(self):
-		self.dialBox = dialogBox.Dialog(self.ui, 'manageServer')
+    def server_infos(self):
+        """Creates a Dialbox displaying Server Informations."""
+        self.dialbox = dialogbox.Dialog(self.gui, 'server_infos')
 
-	def add(self, dialbox):
-		print('ADD CALLBACK')
-		dialbox.serverNameEntry.config(state='normal')
-		dialbox.addressEntry.config(state='normal')
-		dialbox.portEntry.config(state='normal')
+    def manage_server(self):
+        """Creates a Dialbox allowing Servers Management."""
+        self.dialbox = dialogbox.Dialog(self.gui, 'manage_server')
 
-	def edit(self, dialbox):
-		print('EDIT CALLBACK')
-		dialbox.serverNameEntry.config(state='normal')
-		dialbox.addressEntry.config(state='normal')
-		dialbox.portEntry.config(state='normal')
+    def add(self, dialbox):
+        """Allows creation of a new Server."""
+        print('ADD CALLBACK')
+        dialbox.server_name_entry.config(state='normal')
+        dialbox.address_entry.config(state='normal')
+        dialbox.port_entry.config(state='normal')
 
-	def cancel(self, dialbox):
-		dialbox.parent.focus_set()
-		dialbox.destroy()
+    def edit(self, dialbox):
+        """Allows Edition of Server Fields."""
+        print('EDIT CALLBACK')
+        dialbox.server_name_entry.config(state='normal')
+        dialbox.address_entry.config(state='normal')
+        dialbox.port_entry.config(state='normal')
 
-	def done(self, dialbox):
-		#SERVERS MANAGEMENT
-		if dialbox.bodyType == 'manageServer':
-			serverName = dialbox.serverNameEntry.get()
-			serverAddress = dialbox.addressEntry.get()
-			serverPort = dialbox.portEntry.get()
-			if serverName and serverAddress and serverPort:
-				for server in self.ui.client.serverList:
-					if server.name == serverName or server.address == serverAddress:
-						print('DUPLICATE')
-						return
-				newServer = Server(serverName, serverAddress, serverPort)
-				Server.saveServer(newServer, self.ui.client.absPath,
-				self.ui.client.saveDir, self.ui.client.ext)
-				#ADD NEW SERVER TO SERVERLIST
-				self.ui.client.serverList.append(newServer)
-				#ADD NEW SERVER TO LISTBOX
-				dialbox.serverListbox.insert(tk.END, serverName)
-			dialbox.serverNameEntry.delete(0, tk.END)
-			dialbox.addressEntry.delete(0, tk.END)
-			dialbox.portEntry.delete(0, tk.END)
-			dialbox.serverNameEntry.config(state='disabled')
-			dialbox.addressEntry.config(state='disabled')
-			dialbox.portEntry.config(state='disabled')
-			dialbox.cancel(dialbox)
-		#PERSONNAL INFORMATIONS
-		#PSEUDO CHANGE
-		if dialbox.bodyType == 'changePseudo':
-			if self.ui.client.dbcom.identify(dialbox.oldPseudoStr.get(), dialbox.passwordStr.get()):
-				if len(dialbox.newPseudoStr.get()) >= 4:
-					if self.ui.client.dbcom.checkUsername(dialbox.newPseudoStr.get()):
-						self.ui.client.dbcom.update_username(dialbox.oldPseudoStr.get(), dialbox.newPseudoStr.get())
-						mBox.showinfo(self.ui.res.pseudoChanged, self.ui.res.pseudoChanged)
-						dialbox.cancel(dialbox)
-					else:
-						dialbox.outputLabel.configure(text=self.ui.res.pseudoTaken, fg='red')
-				else:
-					dialbox.outputLabel.configure(text=self.ui.res.pseudoTooShort, fg='red')
-			else:
-				dialbox.outputLabel.configure(text=self.ui.res.badNamePassCombo, fg='red')
-		#PASSWORD CHANGE
-		if dialbox.bodyType == 'changePassword':
-			if self.ui.client.dbcom.identify(dialbox.usernameStr.get(), dialbox.oldPasswordStr.get()):
-				if dialbox.newPasswordStr1.get() == dialbox.newPasswordStr2.get():
-					if len(dialbox.newPasswordStr1.get()) >= 4:
-						new_salt = bcrypt.gensalt()
-						while(not self.ui.client.dbcom.checkSalt(new_salt)):
-							new_salt = bcrypt.gensalt()
-						new_password = bcrypt.hashpw(dialbox.newPasswordStr1.get().encode(), new_salt)
-						self.ui.client.dbcom.update_password(dialbox.usernameStr.get(), new_salt, new_password)
-						mBox.showinfo(self.ui.res.passwordChanged, self.ui.res.passwordChanged)
-						dialbox.cancel(dialbox)
-					else:
-						dialbox.outputLabel.configure(text=self.ui.res.passwordTooShort, fg='red')
-				else:
-					dialbox.outputLabel.configure(text=self.ui.res.passwordNonIdentical, fg='red')
-			else:
-				dialbox.outputLabel.configure(text=self.ui.res.badNamePassCombo, fg='red')
+    def cancel(self, dialbox):
+        """Cancel Command."""
+        dialbox.parent.focus_set()
+        dialbox.destroy()
 
-		#CONNECT TO SERVER
-		if dialbox.bodyType == 'connect':
-			serverName = dialbox.serverNameEntry.get()
-			serverAddress = dialbox.addressEntry.get()
-			serverPort = dialbox.portEntry.get()
-			if (serverName != "" and
-			serverAddress != "" and
-			serverPort != "" and
-			self.ui.client.username is not None and
-			self.ui.client.username != ''):
-				self.ui.client.server.connectTo(serverName, (serverAddress, int(serverPort)), self.ui.client)
-				dialbox.cancel(dialbox)
-			else:
-				mBox.showwarning(self.ui.res.serverConnectEmptyTitle, self.ui.res.serverConnectEmptyMsg)
+    def done(self, dialbox):
+        """Done Command."""
+        #SERVERS MANAGEMENT
+        if dialbox.body_type == 'manage_server':
+            server_name = dialbox.server_name_entry.get()
+            server_address = dialbox.address_entry.get()
+            server_port = dialbox.port_entry.get()
+            if server_name and server_address and server_port:
+                for server in self.gui.client.server_list:
+                    if server.name == server_name or \
+                    server.address == server_address:
+                        print('DUPLICATE')
+                        return
+                new_server = Server(server_name, server_address, server_port)
+                Server.save_server(new_server, self.gui.client.abs_path, \
+                self.gui.client.save_dir, self.gui.client.ext)
+                #ADD NEW SERVER TO server_list
+                self.gui.client.server_list.append(new_server)
+                #ADD NEW SERVER TO LISTBOX
+                dialbox.server_listbox.insert(tk.END, server_name)
+            dialbox.server_name_entry.delete(0, tk.END)
+            dialbox.address_entry.delete(0, tk.END)
+            dialbox.port_entry.delete(0, tk.END)
+            dialbox.server_name_entry.config(state='disabled')
+            dialbox.address_entry.config(state='disabled')
+            dialbox.port_entry.config(state='disabled')
+            dialbox.cancel(dialbox)
+        #PERSONNAL INFORMATIONS
+        #PSEUDO CHANGE
+        if dialbox.body_type == 'change_pseudo':
+            if self.gui.client.dbcom.identify(dialbox.old_pseudo_str.get(), \
+            dialbox.password_str.get()):
+                if len(dialbox.new_pseudo_str.get()) >= 4:
+                    if self.gui.client.dbcom.check_username(dialbox.new_pseudo_str.get()):
+                        self.gui.client.dbcom.update_username(dialbox.old_pseudo_str.get(), \
+                        dialbox.new_pseudo_str.get())
+                        mBox.showinfo(self.gui.res.pseudo_changed, \
+                        self.gui.res.pseudo_changed)
+                        dialbox.cancel(dialbox)
+                    else:
+                        dialbox.output_label.configure(text=self.gui.res.pseudo_taken, fg='red')
+                else:
+                    dialbox.output_label.configure(text=self.gui.res.pseudo_too_short, fg='red')
+            else:
+                dialbox.output_label.configure(text=self.gui.res.bad_name_pass_combo, fg='red')
+        #PASSWORD CHANGE
+        if dialbox.body_type == 'change_password':
+            if self.gui.client.dbcom.identify(dialbox.username_str.get(), \
+            dialbox.old_password_str.get()):
+                if dialbox.new_password_str1.get() == dialbox.new_password_str2.get():
+                    if len(dialbox.new_password_str1.get()) >= 4:
+                        new_salt = bcrypt.gensalt()
+                        while not self.gui.client.dbcom.check_salt(new_salt):
+                            new_salt = bcrypt.gensalt()
+                        new_password = bcrypt.hashpw(dialbox.new_password_str1.get().encode(), new_salt)
+                        self.gui.client.dbcom.update_password(dialbox.username_str.get(), \
+                        new_salt, new_password)
+                        mBox.showinfo(self.gui.res.password_changed, \
+                        self.gui.res.password_changed)
+                        dialbox.cancel(dialbox)
+                    else:
+                        dialbox.output_label.configure(text=self.gui.res.password_too_short, fg='red')
+                else:
+                    dialbox.output_label.configure(text=self.gui.res.password_non_identical, fg='red')
+            else:
+                dialbox.output_label.configure(text=self.gui.res.bad_name_pass_combo, fg='red')
 
-	def serverConnect(self):
-		self.dialBox = dialogBox.Dialog(self.ui, 'connect')
+        #CONNECT TO SERVER
+        if dialbox.body_type == 'connect':
+            server_name = dialbox.server_name_entry.get()
+            server_address = dialbox.address_entry.get()
+            server_port = dialbox.port_entry.get()
+            if (server_name != "" and                   \
+            server_address != "" and                    \
+            server_port != "" and                       \
+            self.gui.client.username is not None and    \
+            self.gui.client.username != ''):
+                self.gui.client.server.connect_to(server_name, \
+                (server_address, int(server_port)), self.gui.client)
+                dialbox.cancel(dialbox)
+            else:
+                mBox.showwarning(self.gui.res.server_connect_empty_title, \
+                self.gui.res.server_connect_empty_msg)
 
-	def checkEntry(self):
-		"""Check if the Entries content obey certain Regex."""
-		if self.ui.client.dbcom.checkUsername(self.ui.usernameEntry.get()) \
-			and self.ui.client.dbcom.checkMail(self.ui.mailEntry.get()) \
-			and self.ui.client.dbcom.checkPhoneNumber(self.ui.numberEntry.get()):
-			self.askCode()
+    def server_connect(self):
+        """Creates a Dialbox to connect to a server."""
+        self.dialbox = dialogbox.Dialog(self.gui, 'connect')
 
-	def askCode(self):
-		"""Send then Ask the user for the Confirmation Code sent by SMS."""
-		#Send the Confirmation Code
-		correctCode = smsCode.sendCode(self.ui.numberStr.get())
-		#Clean the UI
-		self.ui.usernameLabel.grid_remove()
-		self.ui.usernameEntry.grid_remove()
-		self.ui.passwordLabel.grid_remove()
-		self.ui.passwordEntry.grid_remove()
-		self.ui.mailLabel.grid_remove()
-		self.ui.mailEntry.grid_remove()
-		self.ui.numberLabel.grid_remove()
-		self.ui.numberEntry.grid_remove()
-		#Confirmation Code Field
-		self.ui.confirmationCodeStr = tk.StringVar()
-		self.ui.confirmatioCodeLabel = tk.Label(self.ui.infosFrame, text=self.ui.res.confirmationCode, pady=5)
-		self.ui.confirmationCodeEntry = tk.Entry(self.ui.infosFrame, textvariable=self.ui.confirmationCodeStr)
-		self.ui.confirmatioCodeLabel.grid(row=0, column=0)
-		self.ui.confirmationCodeEntry.grid(row=1, column=0)
-		#Output Label
-		self.ui.outputLabel = tk.Label(self.ui.infosFrame)
-		self.ui.outputLabel.grid(row=2, column=0)
-		#Confirm command
-		self.ui.logInButton.config(text=self.ui.res.done,
-		command= lambda : self.confirmCode(correctCode))
+    def check_entry(self):
+        """Check if the Entries content obey certain Regex."""
+        if self.gui.client.dbcom.check_username(self.gui.username_entry.get()) \
+            and self.gui.client.dbcom.check_mail(self.gui.mail_entry.get()) \
+            and self.gui.client.dbcom.check_phone_number(self.gui.number_entry.get()):
+            self.ask_code()
 
-	def confirmCode(self, correctCode):
-		if self.ui.confirmationCodeStr.get() == correctCode:
-			self.newUser()
-		else:
-			self.ui.outputLabel.configure(text='Wrong Code',fg='red')
+    def ask_code(self):
+        """Send then Ask the user for the Confirmation Code sent by SMS."""
+        #Send the Confirmation Code
+        correct_code = sms_code.send_code(self.gui.number_str.get())
+        #Clean the UI
+        self.gui.username_label.grid_remove()
+        self.gui.username_entry.grid_remove()
+        self.gui.password_label.grid_remove()
+        self.gui.password_entry.grid_remove()
+        self.gui.mail_label.grid_remove()
+        self.gui.mail_entry.grid_remove()
+        self.gui.number_label.grid_remove()
+        self.gui.number_entry.grid_remove()
+        #Confirmation Code Field
+        self.gui.confirmation_code_str = tk.StringVar()
+        self.gui.confirmation_code_label = tk.Label(self.gui.infos_frame, \
+        text=self.gui.res.confirmation_code, pady=5)
+        self.gui.confirmation_code_entry = tk.Entry(self.gui.infos_frame, \
+        textvariable=self.gui.confirmation_code_str)
+        self.gui.confirmation_code_label.grid(row=0, column=0)
+        self.gui.confirmation_code_entry.grid(row=1, column=0)
+        #Output Label
+        self.gui.output_label = tk.Label(self.gui.infos_frame)
+        self.gui.output_label.grid(row=2, column=0)
+        #Confirm command
+        self.gui.log_in_button.config(text=self.gui.res.done, \
+        command=lambda: self.confirm_code(correct_code))
 
-	def newUser(self):
-		username = self.ui.usernameEntry.get()
-		salt = bcrypt.gensalt()
-		while(not self.ui.client.dbcom.checkSalt(salt)):
-			salt = bcrypt.gensalt()
-		password = bcrypt.hashpw(self.ui.passwordEntry.get().encode(), salt)
-		email = self.ui.mailEntry.get()
-		phoneNumber = self.ui.numberEntry.get()
-		self.ui.client.dbcom.add_user(username, salt, password, email, phoneNumber)
-		self.ui.buildLogInUI()
+    def confirm_code(self, correct_code):
+        """Check if the SMS Confirmation Code Input is Correct."""
+        if self.gui.confirmation_code_str.get() == correct_code:
+            self.new_user()
+        else:
+            self.gui.output_label.configure(text='Wrong Code', fg='red')
 
-	def logIn(self):
-		username = self.ui.usernameEntry.get()
-		password = self.ui.passwordEntry.get()
-		if self.ui.client.dbcom.identify(username, password):
-			self.ui.client.username = username
-			self.ui.buildMainUI()
-		else:
-			self.ui.errorLabel.config(text=self.ui.res.badNamePassCombo)
+    def new_user(self):
+        """Create a new User to the ProjectM Database."""
+        username = self.gui.username_entry.get()
+        salt = bcrypt.gensalt()
+        while not self.gui.client.dbcom.check_salt(salt):
+            salt = bcrypt.gensalt()
+        password = bcrypt.hashpw(self.gui.password_entry.get().encode(), salt)
+        email = self.gui.mail_entry.get()
+        phone_number = self.gui.number_entry.get()
+        self.gui.client.dbcom.add_user(username, salt, password, email, phone_number)
+        self.gui.build_log_in_ui()
+
+    def log_in(self):
+        """Try to log in to the ProjectM Server."""
+        username = self.gui.username_entry.get()
+        password = self.gui.password_entry.get()
+        if self.gui.client.dbcom.identify(username, password):
+            self.gui.client.username = username
+            self.gui.build_main_ui()
+        else:
+            self.gui.error_label.config(text=self.gui.res.bad_name_pass_combo)

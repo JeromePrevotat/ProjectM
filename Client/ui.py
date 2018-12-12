@@ -1,180 +1,192 @@
-#GUI File
+"""Gui Module."""
+
 import tkinter as tk
 
-from tkinter import ttk, scrolledtext, Menu
-from tkinter import messagebox as mBox
+from tkinter import ttk, Menu, scrolledtext
 
 import callbacks as callb
 from resources import Resources
 
-BASE_SIZE = (800,600)
+BASE_SIZE = (800, 600)
 
 class Gui():
-	def __init__(self, client):
-		self.client = client
-		self.root = tk.Tk()
-		self.res = Resources('en')
-		self.callbacks = callb.Callbacks(self)
-		self.init_gui()
+    """Gui Class."""
+    def __init__(self, client):
+        self.client = client
+        self.root = tk.Tk()
+        self.res = Resources('en')
+        self.callbacks = callb.Callbacks(self)
+        self.init_gui()
 
-	def init_gui(self):
-		self.root.title(self.res.title)
-		#Forces the root window to be foreground
-		self.root.lift()
-		self.root.attributes('-topmost', True)
-		self.root.after_idle(self.root.attributes, '-topmost', False)
-		self.root.rowconfigure(0, weight=1)
-		self.root.columnconfigure(0, weight=1)
-		#MAIN FRAME
-		self.mainFrame = tk.Frame(self.root, name='mainFrame')
-		self.mainFrame.grid(row=0, column=0, sticky='NSWE')
-		if not self.client.user.logged :
-			self.buildLogInUI()
+    def init_gui(self):
+        """Initialize the bases of the gui."""
+        self.root.title(self.res.title)
+        #Forces the root window to be foreground
+        self.root.lift()
+        self.root.attributes('-topmost', True)
+        self.root.after_idle(self.root.attributes, '-topmost', False)
+        self.root.rowconfigure(0, weight=1)
+        self.root.columnconfigure(0, weight=1)
+        #MAIN FRAME
+        self.main_frame = tk.Frame(self.root, name='main_frame')
+        self.main_frame.grid(row=0, column=0, sticky='NSWE')
+        if not self.client.user.logged:
+            self.build_log_in_ui()
 
-	def buildLogInUI(self):
-		#FRAMES
-		self.mainFrame.columnconfigure(0, weight=1)
-		self.mainFrame.rowconfigure(0, weight=1)
-		self.logInFrame = tk.Frame(self.mainFrame, width=300, height=450, name="logInFrame")
-		self.logInFrame.grid(row=0, column=0, sticky='NSEW')
-		self.logInFrame.grid_propagate(False)
-		self.logInFrame.columnconfigure(0, weight=1)
-		self.logInFrame.rowconfigure((0,1,2), weight=1)
-		self.infosFrame = tk.Frame(self.logInFrame, width=200, height=200)
-		self.infosFrame.columnconfigure(0, weight=1)
-		self.infosFrame.grid(row=0, column=0, sticky='NSEW')
-		self.infosFrame.grid_propagate(False)
-		self.errorFrame = tk.Frame(self.logInFrame)
-		self.errorFrame.grid(row=1,column=0)
-		self.buttonFrame = tk.Frame(self.logInFrame, width=200, height=50)
-		self.buttonFrame.columnconfigure((0,1), weight=1)
-		self.buttonFrame.grid(row=2, column=0, sticky='NSEW')
-		self.buttonFrame.grid_propagate(False)
-		#USERNAME
-		self.username = tk.StringVar()
-		self.usernameLabel = tk.Label(self.infosFrame, text=self.res.username, pady=5)
-		self.usernameEntry = tk.Entry(self.infosFrame, textvariable=self.username)
-		self.usernameLabel.grid(row=0, column=0)
-		self.usernameEntry.grid(row=1, column=0)
-		#PASSWORD
-		self.password = tk.StringVar()
-		self.passwordLabel = tk.Label(self.infosFrame, text=self.res.password, pady=5)
-		self.passwordEntry = tk.Entry(self.infosFrame, textvariable=self.password, show='*')
-		self.passwordLabel.grid(row=2, column=0)
-		self.passwordEntry.grid(row=3, column=0)
-		#ERROR
-		self.errorLabel = tk.Label(self.errorFrame, wraplength=190, fg='red')
-		self.errorLabel.grid(row=4, column=0, padx=5)
-		#BUTTONS
-		self.logInButton = tk.Button(self.buttonFrame, text=self.res.logIn, width=8,
-		name="logInButton", command=self.callbacks.logIn)
-		self.exitButton = tk.Button(self.buttonFrame, text=self.res.exit, width=8,
-		name="exitButton", command=self.callbacks._quit)
-		self.registerButton = tk.Button(self.buttonFrame, text=self.res.register, width=8,
-		name="registerButton", command=self.buildRegister)
-		self.logInButton.grid(row=1, column=0)
-		self.exitButton.grid(row=1, column=1)
-		self.registerButton.grid(row=0, column=0, columnspan=2, padx=5)
-		#Set Keypress Return default behaviour to Done
-		self.logInButton.focus_set()
-		self.mainFrame.bind_all("<Return>", self.callbacks.keyPress_Return)
+    def build_log_in_ui(self):
+        """Build the Log In gui."""
+        #FRAMES
+        self.main_frame.columnconfigure(0, weight=1)
+        self.main_frame.rowconfigure(0, weight=1)
+        self.log_in_frame = tk.Frame(self.main_frame, width=300, height=450, \
+        name="log_in_frame")
+        self.log_in_frame.grid(row=0, column=0, sticky='NSEW')
+        self.log_in_frame.grid_propagate(False)
+        self.log_in_frame.columnconfigure(0, weight=1)
+        self.log_in_frame.rowconfigure((0, 1, 2), weight=1)
+        self.infos_frame = tk.Frame(self.log_in_frame, width=200, height=200)
+        self.infos_frame.columnconfigure(0, weight=1)
+        self.infos_frame.grid(row=0, column=0, sticky='NSEW')
+        self.infos_frame.grid_propagate(False)
+        self.error_frame = tk.Frame(self.log_in_frame)
+        self.error_frame.grid(row=1, column=0)
+        self.button_frame = tk.Frame(self.log_in_frame, width=200, height=50)
+        self.button_frame.columnconfigure((0, 1), weight=1)
+        self.button_frame.grid(row=2, column=0, sticky='NSEW')
+        self.button_frame.grid_propagate(False)
+        #USERNAME
+        self.username = tk.StringVar()
+        self.username_label = tk.Label(self.infos_frame, \
+        text=self.res.username, pady=5)
+        self.username_entry = tk.Entry(self.infos_frame, \
+        textvariable=self.username)
+        self.username_label.grid(row=0, column=0)
+        self.username_entry.grid(row=1, column=0)
+        #PASSWORD
+        self.password = tk.StringVar()
+        self.password_label = tk.Label(self.infos_frame, \
+        text=self.res.password, pady=5)
+        self.password_entry = tk.Entry(self.infos_frame, \
+        textvariable=self.password, show='*')
+        self.password_label.grid(row=2, column=0)
+        self.password_entry.grid(row=3, column=0)
+        #ERROR
+        self.error_label = tk.Label(self.error_frame, wraplength=190, fg='red')
+        self.error_label.grid(row=4, column=0, padx=5)
+        #BUTTONS
+        self.log_in_button = tk.Button(self.button_frame, text=self.res.log_in, \
+        width=8, name="log_in_button", command=self.callbacks.log_in)
+        self.exit_button = tk.Button(self.button_frame, text=self.res.exit, \
+        width=8, name="exit_button", command=self.callbacks._quit)
+        self.register_button = tk.Button(self.button_frame,         \
+        text=self.res.register, width=8, name="register_button",    \
+        command=self.build_register)
+        self.log_in_button.grid(row=1, column=0)
+        self.exit_button.grid(row=1, column=1)
+        self.register_button.grid(row=0, column=0, columnspan=2, padx=5)
+        #Set Keypress Return default behaviour to Done
+        self.log_in_button.focus_set()
+        self.main_frame.bind_all("<Return>", self.callbacks.key_press_return)
 
-	def buildRegister(self):
-		self.mail = tk.StringVar()
-		self.usernameEntry.delete(0, tk.END)
-		self.passwordEntry.delete(0, tk.END)
-		self.mailLabel = tk.Label(self.infosFrame, text=self.res.mail, pady=5)
-		self.mailEntry = tk.Entry(self.infosFrame, textvariable=self.mail)
-		self.mailLabel.grid(row=4 ,column=0)
-		self.mailEntry.grid(row=5, column=0)
-		#Number Field
-		self.numberStr = tk.StringVar()
-		self.numberLabel = tk.Label(self.infosFrame, text=self.res.number, pady=5)
-		self.numberEntry = tk.Entry(self.infosFrame, textvariable=self.numberStr)
-		self.numberLabel.grid(row=6, column=0)
-		self.numberEntry.grid(row=7, column=0)
-		#End number Field
-		self.registerButton.grid_remove()
-		#REGISTER MODE
-		#Ask for the confirmation sent via sms
-		self.logInButton.config(text=self.res.done,
-		command=self.callbacks.checkEntry)
-		#Create the new user in the DB
-		#self.logInButton.config(text=self.res.done,
-		#command=self.callbacks.newUser)
-		#Exit Button
-		self.exitButton.config(text=self.res.cancel,
-		command=self.buildLogInUI)
+    def build_register(self):
+        """Build the Register Window gui."""
+        self.mail = tk.StringVar()
+        self.username_entry.delete(0, tk.END)
+        self.password_entry.delete(0, tk.END)
+        self.mail_label = tk.Label(self.infos_frame, text=self.res.mail, pady=5)
+        self.mail_entry = tk.Entry(self.infos_frame, textvariable=self.mail)
+        self.mail_label.grid(row=4, column=0)
+        self.mail_entry.grid(row=5, column=0)
+        #Number Field
+        self.number_str = tk.StringVar()
+        self.number_label = tk.Label(self.infos_frame, text=self.res.number, pady=5)
+        self.number_entry = tk.Entry(self.infos_frame, textvariable=self.number_str)
+        self.number_label.grid(row=6, column=0)
+        self.number_entry.grid(row=7, column=0)
+        #End number Field
+        self.register_button.grid_remove()
+        #REGISTER MODE
+        #Create the new user in the DB
+        #Ask for the confirmation sent via sms
+        self.log_in_button.config(text=self.res.done, \
+        command=self.callbacks.check_entry)
+        #Do not ask for the confirmation via sms
+        #self.log_in_button.config(text=self.res.done,
+        #command=self.callbacks.newUser)
+        #Exit Button
+        self.exit_button.config(text=self.res.cancel, \
+        command=self.build_log_in_ui)
 
-	def buildMainUI(self):
-		self.mainFrame.rowconfigure(0, weight=1)
-		self.mainFrame.rowconfigure(1, weight=2)
-		self.mainFrame.columnconfigure(0, weight=1)
-		self.mainFrame.columnconfigure(1, weight=3)
-		#USER FRAME
-		self.userFrame = tk.LabelFrame(self.mainFrame, text=self.res.userListLabel,
-		width=BASE_SIZE[0]/4, height=BASE_SIZE[1])
-		self.userFrame.rowconfigure(0, weight=1)
-		self.userFrame.columnconfigure(0, weight=1)
-		self.userFrame.grid(row=0, column=0, rowspan=2, sticky='NSWE')
-		#READ FRAME
-		self.outputFrame = tk.LabelFrame(self.mainFrame, text=self.res.outputLabel,
-		width=BASE_SIZE[0]*0.75, height=(BASE_SIZE[1]/3)*2)
-		self.outputFrame.rowconfigure(0, weight=1)
-		self.outputFrame.columnconfigure(0, weight=1)
-		self.outputFrame.grid(row=0, column=1, sticky='NSWE')
-		#WRITE FRAME
-		self.inputFrame = tk.LabelFrame(self.mainFrame, text=self.res.inputLabel,
-		width=BASE_SIZE[0]*0.75, height=BASE_SIZE[1]/3)
-		self.inputFrame.rowconfigure(0, weight=1)
-		self.inputFrame.columnconfigure(0, weight=1)
-		self.inputFrame.grid(row=1, column=1, sticky='NSWE')
+    def build_main_ui(self):
+        """Build the Main gui"""
+        self.main_frame.rowconfigure(0, weight=1)
+        self.main_frame.rowconfigure(1, weight=2)
+        self.main_frame.columnconfigure(0, weight=1)
+        self.main_frame.columnconfigure(1, weight=3)
+        #USER FRAME
+        self.user_frame = tk.LabelFrame(self.main_frame, \
+        text=self.res.user_list_label, width=BASE_SIZE[0]/4, height=BASE_SIZE[1])
+        self.user_frame.rowconfigure(0, weight=1)
+        self.user_frame.columnconfigure(0, weight=1)
+        self.user_frame.grid(row=0, column=0, rowspan=2, sticky='NSWE')
+        #READ FRAME
+        self.output_frame = tk.LabelFrame(self.main_frame, \
+        text=self.res.output_label, width=BASE_SIZE[0]*0.75, height=(BASE_SIZE[1]/3)*2)
+        self.output_frame.rowconfigure(0, weight=1)
+        self.output_frame.columnconfigure(0, weight=1)
+        self.output_frame.grid(row=0, column=1, sticky='NSWE')
+        #WRITE FRAME
+        self.input_frame = tk.LabelFrame(self.main_frame, \
+        text=self.res.input_label, width=BASE_SIZE[0]*0.75, height=BASE_SIZE[1]/3)
+        self.input_frame.rowconfigure(0, weight=1)
+        self.input_frame.columnconfigure(0, weight=1)
+        self.input_frame.grid(row=1, column=1, sticky='NSWE')
 
-		#USER SCROLLEDTEXT
-		self.userList = tk.scrolledtext.ScrolledText(self.userFrame, wrap=tk.WORD,
-		width=25, state='disabled')
-		self.userList.grid(row=0, column=0, sticky='NSWE', pady=2, padx=1)
-		#READ SCROLLEDTEXT
-		self.msgOutput = tk.scrolledtext.ScrolledText(self.outputFrame, wrap=tk.WORD,
-		state='disabled')
-		self.msgOutput.grid(row=0, column=0, sticky='NSWE', padx=1, pady=2)
-		#WRITE SCROLLEDTEXT
-		self.msgInput = tk.scrolledtext.ScrolledText(self.inputFrame, wrap=tk.WORD,
-		height=11)
-		self.msgInput.grid(row=0, column=0, sticky='NSWE', padx=1, pady=2)
+        #USER SCROLLEDTEXT
+        self.user_list = tk.scrolledtext.ScrolledText(self.user_frame, \
+        wrap=tk.WORD, width=25, state='disabled')
+        self.user_list.grid(row=0, column=0, sticky='NSWE', pady=2, padx=1)
+        #READ SCROLLEDTEXT
+        self.msg_output = tk.scrolledtext.ScrolledText(self.output_frame, \
+        wrap=tk.WORD, state='disabled')
+        self.msg_output.grid(row=0, column=0, sticky='NSWE', padx=1, pady=2)
+        #WRITE SCROLLEDTEXT
+        self.msg_input = tk.scrolledtext.ScrolledText(self.input_frame, \
+        wrap=tk.WORD, height=11)
+        self.msg_input.grid(row=0, column=0, sticky='NSWE', padx=1, pady=2)
 
-		#SEND BUTTON
-		self.sendButton = ttk.Button(self.inputFrame, text=self.res.send)
-		self.sendButton.grid(row=1, column=0)
+        #SEND BUTTON
+        self.send_button = ttk.Button(self.input_frame, text=self.res.send)
+        self.send_button.grid(row=1, column=0)
 
-		#MENUS
-		#MAIN BAR
-		self.menuBar = Menu(self.root)
-		self.root.config(menu=self.menuBar)
-		#SERVER MENU
-		self.serverMenu = Menu(self.menuBar, tearoff=0)
-		self.serverMenu.add_command(label=self.res.serverConnect, state='disabled',
-		command=self.callbacks.serverConnect)
-		self.serverMenu.add_command(label=self.res.serverInfos, state='disabled',
-		command=self.callbacks.serverInfos)
-		self.serverMenu.add_command(label=self.res.manageServer,
-		command=self.callbacks.manageServer)
-		self.menuBar.add_cascade(label=self.res.serverMenu, menu=self.serverMenu)
-		#PROFILE MENU
-		self.profileMenu = Menu(self.menuBar, tearoff=0)
-		#Change Pseudo
-		self.profileMenu.add_command(label=self.res.changePseudo,
-		command=self.callbacks.changePseudo)
-		#Change password
-		self.profileMenu.add_command(label=self.res.changePassword,
-		command=self.callbacks.changePassword)
-		#Change mail
-		self.menuBar.add_cascade(label=self.res.profile, menu=self.profileMenu)
-		#HELP MENU
-		self.helpMenu = Menu(self.menuBar, tearoff=0)
-		self.helpMenu.add_command(label=self.res.about)
-		self.menuBar.add_cascade(label=self.res.helpMenu, menu=self.helpMenu)
-		########################################################################
-		#   THREAD UPDATE MENU												   #
-		########################################################################
-		self.client.threadList.createThread('updateMenu', self)
+        #MENUS
+        #MAIN BAR
+        self.menu_bar = Menu(self.root)
+        self.root.config(menu=self.menu_bar)
+        #SERVER MENU
+        self.server_menu = Menu(self.menu_bar, tearoff=0)
+        self.server_menu.add_command(label=self.res.server_connect, \
+        state='disabled', command=self.callbacks.server_connect)
+        self.server_menu.add_command(label=self.res.server_infos, \
+        state='disabled', command=self.callbacks.server_infos)
+        self.server_menu.add_command(label=self.res.manage_server, \
+        command=self.callbacks.manage_server)
+        self.menu_bar.add_cascade(label=self.res.server_menu, menu=self.server_menu)
+        #PROFILE MENU
+        self.profile_menu = Menu(self.menu_bar, tearoff=0)
+        #Change Pseudo
+        self.profile_menu.add_command(label=self.res.change_pseudo, \
+        command=self.callbacks.change_pseudo)
+        #Change password
+        self.profile_menu.add_command(label=self.res.change_password, \
+        command=self.callbacks.change_password)
+        #Change mail
+        self.menu_bar.add_cascade(label=self.res.profile, menu=self.profile_menu)
+        #HELP MENU
+        self.help_menu = Menu(self.menu_bar, tearoff=0)
+        self.help_menu.add_command(label=self.res.about)
+        self.menu_bar.add_cascade(label=self.res.help_menu, menu=self.help_menu)
+        ########################################################################
+        #   THREAD UPDATE MENU                                                   #
+        ########################################################################
+        self.client.thread_list.create_thread('update_menu', self)

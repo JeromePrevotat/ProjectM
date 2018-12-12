@@ -3,16 +3,13 @@
 import os
 import sys
 import socket
-from os import path
 
 from user import User
-from queue import Queue, Empty
+from queue import Queue
 from ui import Gui
-from server import Server, getServerList
+from server import Server, get_server_list
 from threads import Threads
 from db_com import DBCom
-
-import encoding
 
 class Client():
     """Client Client."""
@@ -34,7 +31,7 @@ class Client():
         self.save_dir = './savedServers'
         self.ext = '.srv'
         os.chdir(self.abs_path)
-        self.server_list = getServerList(self)
+        self.server_list = get_server_list(self)
         self.username = None
 
 if __name__ == "__main__":
