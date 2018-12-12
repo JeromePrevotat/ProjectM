@@ -20,7 +20,7 @@ class ProjectM_Server():
         self.starttime = datetime.datetime.now()
         print('Server online at ' + str(datetime.datetime.now()))
         self.user_list = []
-        self.to_read = None
+        self.to_read = []
         self.new_connexion = None
 
     def start(self):
@@ -69,8 +69,10 @@ class ProjectM_Server():
         for user in self.user_list:
             try:
                 user[0].send(cmd)
-            except:
-                pass
+            except Exception as err:
+                print("Error : " + os.strerror(err.errno))
+                print(user)
+                self.logout_user(user, True)
 
     def accept_connexion(self):
         """Accept newly logged users."""
@@ -127,7 +129,7 @@ class ProjectM_Server():
         """Logs out from the server the given user and notifies it,
         except if it's a forced disconnection."""
         i = 0
-        while self.user_list[i][0] != user and i < len(self.user_list):
+        while i < len(self.user_list)and self.user_list[i][0] != user:
             i += 1
         print(str(self.user_list[i][1]) + " logged out. Closing socket.")
         if not forced:
