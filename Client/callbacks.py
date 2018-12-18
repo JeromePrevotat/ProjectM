@@ -6,7 +6,7 @@ from tkinter import messagebox as mBox
 import bcrypt
 
 
-from server import Server
+from server import Server, get_server_list, remove_server
 
 import timeformat as tFormat
 import dialogbox
@@ -73,7 +73,7 @@ class Callbacks():
 
     def edit(self, dialbox):
         """Allows Edition of Server Fields."""
-        print('EDIT CALLBACK')
+        dialbox.edit = True
         dialbox.server_name_entry.config(state='normal')
         dialbox.address_entry.config(state='normal')
         dialbox.port_entry.config(state='normal')
@@ -83,33 +83,41 @@ class Callbacks():
         dialbox.parent.focus_set()
         dialbox.destroy()
 
+    def remove(self, dialbox):
+        """Removes a Server from the Server Listbox."""
+        server_name = dialbox.server_name_entry.get()
+        remove_server(server_name, self.gui.client.abs_path, \
+        self.gui.client.save_dir, self.gui.client.ext)
+        self.gui.client.server_list = get_server_list(self.gui.client)
+        dialbox.cancel(dialbox)
+
+    def done_manage(self, dialbox):
+        server_name = dialbox.server_name_entry.get()
+        server_address = dialbox.address_entry.get()
+        server_port = dialbox.port_entry.get()
+        if server_name and server_address and server_port:
+            new_server = Server(server_name, server_address, server_port)
+            remove_server(server_name, self.gui.client.abs_path, \
+            self.gui.client.save_dir, self.gui.client.ext)
+            Server.save_server(new_server, self.gui.client.abs_path, \
+            self.gui.client.save_dir, self.gui.client.ext)
+            #ADD NEW SERVER TO server_list
+            self.gui.client.server_list = get_server_list(self.gui.client)
+            #ADD NEW SERVER TO LISTBOX
+            dialbox.server_listbox.insert(tk.END, server_name)
+        dialbox.server_name_entry.delete(0, tk.END)
+        dialbox.address_entry.delete(0, tk.END)
+        dialbox.port_entry.delete(0, tk.END)
+        dialbox.server_name_entry.config(state='disabled')
+        dialbox.address_entry.config(state='disabled')
+        dialbox.port_entry.config(state='disabled')
+        dialbox.cancel(dialbox)
+
     def done(self, dialbox):
         """Done Command."""
         #SERVERS MANAGEMENT
         if dialbox.body_type == 'manage_server':
-            server_name = dialbox.server_name_entry.get()
-            server_address = dialbox.address_entry.get()
-            server_port = dialbox.port_entry.get()
-            if server_name and server_address and server_port:
-                for server in self.gui.client.server_list:
-                    if server.name == server_name or \
-                    server.address == server_address:
-                        print('DUPLICATE')
-                        return
-                new_server = Server(server_name, server_address, server_port)
-                Server.save_server(new_server, self.gui.client.abs_path, \
-                self.gui.client.save_dir, self.gui.client.ext)
-                #ADD NEW SERVER TO server_list
-                self.gui.client.server_list.append(new_server)
-                #ADD NEW SERVER TO LISTBOX
-                dialbox.server_listbox.insert(tk.END, server_name)
-            dialbox.server_name_entry.delete(0, tk.END)
-            dialbox.address_entry.delete(0, tk.END)
-            dialbox.port_entry.delete(0, tk.END)
-            dialbox.server_name_entry.config(state='disabled')
-            dialbox.address_entry.config(state='disabled')
-            dialbox.port_entry.config(state='disabled')
-            dialbox.cancel(dialbox)
+            self.done_manage(dialbox)
         #PERSONNAL INFORMATIONS
         #PSEUDO CHANGE
         if dialbox.body_type == 'change_pseudo':

@@ -63,7 +63,8 @@ def fill_button_frame(dialbox):
     dialbox.add_button.grid(row=0, column=0)
     #DELETE BUTTON
     dialbox.del_button = tk.Button(dialbox.button_frame,    \
-    text=dialbox.gui.res.delete, width=10)
+    text=dialbox.gui.res.delete, width=10,
+    command=lambda: dialbox.gui.callbacks.remove(dialbox))
     dialbox.del_button.grid(row=0, column=1)
     #EDIT BUTTON
     dialbox.edit_button = tk.Button(dialbox.button_frame,   \

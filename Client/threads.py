@@ -69,22 +69,26 @@ class Threads():
             if len(dialbox.server_listbox.curselection()) > 0:
                 if isinstance(dialbox.server_listbox.curselection()[0], int):
                     index = dialbox.server_listbox.curselection()[0]
-                    self.update_server_entries(dialbox, index)
+                    try:
+                        self.update_server_entries(dialbox, index)
+                    except:
+                        pass
                 if isinstance(dialbox.server_listbox.curselection()[0], str):
                     self.update_server_entries(dialbox, index)
             time.sleep(0.2)
 
     def update_server_entries(self, dialbox, index):
         """Thread displaying Servers Infos."""
-        dialbox.server_name_entry.config(state='normal')
-        dialbox.server_name.set(self.client.server_list[index].name)
-        dialbox.server_name_entry.config(state='disabled')
-        dialbox.address_entry.config(state='normal')
-        dialbox.server_address.set(self.client.server_list[index].address)
-        dialbox.address_entry.config(state='disabled')
-        dialbox.port_entry.config(state='normal')
-        dialbox.port.set(self.client.server_list[index].port)
-        dialbox.port_entry.config(state='disabled')
+        if not dialbox.edit:
+            dialbox.server_name_entry.config(state='normal')
+            dialbox.server_name.set(self.client.server_list[index].name)
+            dialbox.server_name_entry.config(state='disabled')
+            dialbox.address_entry.config(state='normal')
+            dialbox.server_address.set(self.client.server_list[index].address)
+            dialbox.address_entry.config(state='disabled')
+            dialbox.port_entry.config(state='normal')
+            dialbox.port.set(self.client.server_list[index].port)
+            dialbox.port_entry.config(state='disabled')
 
     def listen_server(self):
         """Thread listenning to the Server."""

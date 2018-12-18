@@ -29,6 +29,7 @@ class Server():
             pickler.dump(self)
         os.chdir(abs_path)
 
+
     def connect_to(self, server_name, server_infos, client):
         """Connect to a Server."""
         client.server.name = server_name
@@ -93,3 +94,14 @@ def get_server_list(client):
             server_list.append(server)
     os.chdir(client.abs_path)
     return server_list
+
+def remove_server(to_rm, abs_path=None, save_dir=None, ext=None):
+    """Delete a Server."""
+    if os.path.exists(save_dir) and not os.path.isfile(save_dir):
+        os.chdir(save_dir)
+    else:
+        os.mkdir(save_dir)
+        os.chdir(save_dir)
+    if os.path.exists(to_rm + ext):
+        os.remove(to_rm + ext)
+    os.chdir(abs_path)

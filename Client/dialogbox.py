@@ -49,6 +49,7 @@ class Dialog(tk.Toplevel):
     def build_manage_server(self):
         """Build the Manage Servers Window."""
         import manage_server
+        self.edit = False
         manage_server.build_frames(self)
         manage_server.fill_server_list_frame(self)
         manage_server.fill_server_infos_frame(self)
