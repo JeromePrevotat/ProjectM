@@ -66,10 +66,13 @@ class Callbacks():
 
     def add(self, dialbox):
         """Allows creation of a new Server."""
-        print('ADD CALLBACK')
+        dialbox.edit = True
         dialbox.server_name_entry.config(state='normal')
         dialbox.address_entry.config(state='normal')
         dialbox.port_entry.config(state='normal')
+        dialbox.server_name_entry.delete(0, tk.END)
+        dialbox.address_entry.delete(0, tk.END)
+        dialbox.port_entry.delete(0, tk.END)
 
     def edit(self, dialbox):
         """Allows Edition of Server Fields."""
@@ -92,6 +95,7 @@ class Callbacks():
         dialbox.cancel(dialbox)
 
     def done_manage(self, dialbox):
+        """Done Callback for the Manage Servers Dialbox."""
         server_name = dialbox.server_name_entry.get()
         server_address = dialbox.address_entry.get()
         server_port = dialbox.port_entry.get()
@@ -113,67 +117,77 @@ class Callbacks():
         dialbox.port_entry.config(state='disabled')
         dialbox.cancel(dialbox)
 
+    def done_change_pseudo(self, dialbox):
+        """Done Callback for the Change Pseudo Dialbox."""
+        if self.gui.client.dbcom.identify(dialbox.old_pseudo_str.get(), \
+        dialbox.password_str.get()):
+            if len(dialbox.new_pseudo_str.get()) >= 4:
+                if self.gui.client.dbcom.check_username(dialbox.new_pseudo_str.get()):
+                    self.gui.client.dbcom.update_username(dialbox.old_pseudo_str.get(), \
+                    dialbox.new_pseudo_str.get())
+                    mBox.showinfo(self.gui.res.pseudo_changed, \
+                    self.gui.res.pseudo_changed)
+                    dialbox.cancel(dialbox)
+                else:
+                    dialbox.output_label.configure(text=self.gui.res.pseudo_taken, fg='red')
+            else:
+                dialbox.output_label.configure(text=self.gui.res.pseudo_too_short, fg='red')
+        else:
+            dialbox.output_label.configure(text=self.gui.res.bad_name_pass_combo, fg='red')
+
+    def done_change_password(self, dialbox):
+        """Done Callback for the Change Password Dialbox."""
+        if self.gui.client.dbcom.identify(dialbox.username_str.get(), \
+        dialbox.old_password_str.get()):
+            if dialbox.new_password_str1.get() == dialbox.new_password_str2.get():
+                if len(dialbox.new_password_str1.get()) >= 4:
+                    new_salt = bcrypt.gensalt()
+                    while not self.gui.client.dbcom.check_salt(new_salt):
+                        new_salt = bcrypt.gensalt()
+                    new_password = bcrypt.hashpw(dialbox.new_password_str1.get().encode(), new_salt)
+                    self.gui.client.dbcom.update_password(dialbox.username_str.get(), \
+                    new_salt, new_password)
+                    mBox.showinfo(self.gui.res.password_changed, \
+                    self.gui.res.password_changed)
+                    dialbox.cancel(dialbox)
+                else:
+                    dialbox.output_label.configure(text=self.gui.res.password_too_short, fg='red')
+            else:
+                dialbox.output_label.configure(text=self.gui.res.password_non_identical, fg='red')
+        else:
+            dialbox.output_label.configure(text=self.gui.res.bad_name_pass_combo, fg='red')
+
+    def done_connect_to(self, dialbox):
+        """Done Callback for the Connect to a Server Dialbox."""
+        server_name = dialbox.server_name_entry.get()
+        server_address = dialbox.address_entry.get()
+        server_port = dialbox.port_entry.get()
+        if (server_name != "" and                   \
+        server_address != "" and                    \
+        server_port != "" and                       \
+        self.gui.client.username is not None and    \
+        self.gui.client.username != ''):
+            self.gui.client.server.connect_to(server_name, \
+            (server_address, int(server_port)), self.gui.client)
+            dialbox.cancel(dialbox)
+        else:
+            mBox.showwarning(self.gui.res.server_connect_empty_title, \
+            self.gui.res.server_connect_empty_msg)
+
     def done(self, dialbox):
         """Done Command."""
         #SERVERS MANAGEMENT
         if dialbox.body_type == 'manage_server':
             self.done_manage(dialbox)
-        #PERSONNAL INFORMATIONS
         #PSEUDO CHANGE
         if dialbox.body_type == 'change_pseudo':
-            if self.gui.client.dbcom.identify(dialbox.old_pseudo_str.get(), \
-            dialbox.password_str.get()):
-                if len(dialbox.new_pseudo_str.get()) >= 4:
-                    if self.gui.client.dbcom.check_username(dialbox.new_pseudo_str.get()):
-                        self.gui.client.dbcom.update_username(dialbox.old_pseudo_str.get(), \
-                        dialbox.new_pseudo_str.get())
-                        mBox.showinfo(self.gui.res.pseudo_changed, \
-                        self.gui.res.pseudo_changed)
-                        dialbox.cancel(dialbox)
-                    else:
-                        dialbox.output_label.configure(text=self.gui.res.pseudo_taken, fg='red')
-                else:
-                    dialbox.output_label.configure(text=self.gui.res.pseudo_too_short, fg='red')
-            else:
-                dialbox.output_label.configure(text=self.gui.res.bad_name_pass_combo, fg='red')
+            self.done_change_pseudo(dialbox)
         #PASSWORD CHANGE
         if dialbox.body_type == 'change_password':
-            if self.gui.client.dbcom.identify(dialbox.username_str.get(), \
-            dialbox.old_password_str.get()):
-                if dialbox.new_password_str1.get() == dialbox.new_password_str2.get():
-                    if len(dialbox.new_password_str1.get()) >= 4:
-                        new_salt = bcrypt.gensalt()
-                        while not self.gui.client.dbcom.check_salt(new_salt):
-                            new_salt = bcrypt.gensalt()
-                        new_password = bcrypt.hashpw(dialbox.new_password_str1.get().encode(), new_salt)
-                        self.gui.client.dbcom.update_password(dialbox.username_str.get(), \
-                        new_salt, new_password)
-                        mBox.showinfo(self.gui.res.password_changed, \
-                        self.gui.res.password_changed)
-                        dialbox.cancel(dialbox)
-                    else:
-                        dialbox.output_label.configure(text=self.gui.res.password_too_short, fg='red')
-                else:
-                    dialbox.output_label.configure(text=self.gui.res.password_non_identical, fg='red')
-            else:
-                dialbox.output_label.configure(text=self.gui.res.bad_name_pass_combo, fg='red')
-
+            self.done_change_password(dialbox)
         #CONNECT TO SERVER
         if dialbox.body_type == 'connect':
-            server_name = dialbox.server_name_entry.get()
-            server_address = dialbox.address_entry.get()
-            server_port = dialbox.port_entry.get()
-            if (server_name != "" and                   \
-            server_address != "" and                    \
-            server_port != "" and                       \
-            self.gui.client.username is not None and    \
-            self.gui.client.username != ''):
-                self.gui.client.server.connect_to(server_name, \
-                (server_address, int(server_port)), self.gui.client)
-                dialbox.cancel(dialbox)
-            else:
-                mBox.showwarning(self.gui.res.server_connect_empty_title, \
-                self.gui.res.server_connect_empty_msg)
+            self.done_connect_to(dialbox)
 
     def server_connect(self):
         """Creates a Dialbox to connect to a server."""
@@ -237,7 +251,14 @@ class Callbacks():
         """Try to log in to the ProjectM Server."""
         username = self.gui.username_entry.get()
         password = self.gui.password_entry.get()
-        if self.gui.client.dbcom.identify(username, password):
+        success = False
+        try:
+            success = self.gui.client.dbcom.identify(username, password)
+        except:
+            self.gui.error_label.config(text=self.gui.res.connection_to_projectm_failed)
+            return
+        if success:
+        #if self.gui.client.dbcom.identify(username, password):
             self.gui.client.username = username
             self.gui.build_main_ui()
         else:

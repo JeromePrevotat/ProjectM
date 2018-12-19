@@ -80,15 +80,11 @@ class Threads():
     def update_server_entries(self, dialbox, index):
         """Thread displaying Servers Infos."""
         if not dialbox.edit:
-            dialbox.server_name_entry.config(state='normal')
+            dialbox.entries_unlock()
             dialbox.server_name.set(self.client.server_list[index].name)
-            dialbox.server_name_entry.config(state='disabled')
-            dialbox.address_entry.config(state='normal')
             dialbox.server_address.set(self.client.server_list[index].address)
-            dialbox.address_entry.config(state='disabled')
-            dialbox.port_entry.config(state='normal')
             dialbox.port.set(self.client.server_list[index].port)
-            dialbox.port_entry.config(state='disabled')
+            dialbox.entries_lock()
 
     def listen_server(self):
         """Thread listenning to the Server."""

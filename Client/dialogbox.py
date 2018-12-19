@@ -17,6 +17,7 @@ class Dialog(tk.Toplevel):
         self.parent = self.gui.root
         self.return_value = None
         self.master_frame = tk.Frame(self)
+        self.button_frame = None
         self.body_build()
         self.master_frame.grid(row=0, column=0, padx=5, pady=5)
         self.grab_set()
@@ -58,6 +59,7 @@ class Dialog(tk.Toplevel):
     def build_connect(self):
         """Build the Connect Window."""
         import manage_server
+        self.edit = False
         manage_server.build_frames(self)
         manage_server.fill_server_list_frame(self)
         manage_server.fill_server_infos_frame(self)
@@ -104,9 +106,9 @@ class Dialog(tk.Toplevel):
         text=self.gui.res.adress_label)
         self.adress_label.grid(row=1, column=0, sticky='W')
         self.server_adress = tk.StringVar()
-        self.adress_entry = tk.Entry(self.master_frame, \
+        self.address_entry = tk.Entry(self.master_frame, \
         textvariable=self.server_adress, width=25, state='disabled')
-        self.adress_entry.grid(row=1, column=1)
+        self.address_entry.grid(row=1, column=1)
         #PORT
         self.port_label = tk.Label(self.master_frame, text=self.gui.res.port_label)
         self.port_label.grid(row=2, column=0, sticky='W')
@@ -114,6 +116,18 @@ class Dialog(tk.Toplevel):
         self.port_entry = tk.Entry(self.master_frame, textvariable=self.port, \
         width=25, state='disabled')
         self.port_entry.grid(row=2, column=1)
+
+    def entries_unlock(self):
+        """Unlock dialbox Entries to Edit their Text."""
+        self.server_name_entry.config(state='normal')
+        self.address_entry.config(state='normal')
+        self.port_entry.config(state='normal')
+
+    def entries_lock(self):
+        """Lock dialbox Entries to prevent Editing their Text."""
+        self.server_name_entry.config(state='disabled', disabledbackgroung="White")
+        self.address_entry.config(state='disabled', disabledbackgroung="White")
+        self.port_entry.config(state='disabled', disabledbackgroung="White")
 
     def cancel(self, event=None):
         """Command to Quit and Destroy the DialogBox."""

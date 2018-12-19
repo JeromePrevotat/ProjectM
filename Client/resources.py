@@ -67,6 +67,7 @@ class Resources():
         self.help_menu = 'Help'
         self.about = 'About'
         #ERROR OUTPUT
+        self.connection_to_projectm_failed = 'Connection to ProjectM Servers Failed.'
         self.bad_name_pass_combo = 'Invalid Username or Password.\n'
         self.bad_name_regex = 'Username must be at least 4 characters length and only contains letters, numbers and "-" and "_".\n'
         self.name_taken = 'This Username already exists.\n'
