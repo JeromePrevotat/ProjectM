@@ -14,8 +14,6 @@ Default param : localhost:4242 and stays online up to 5min.
 
 To Do List :
 Client :
-- Add Server is now broken...
-- Edit Button not working realy well.
 - Change Email
 - Menu Management
 - One Time Connection to fix.
