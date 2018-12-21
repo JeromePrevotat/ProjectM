@@ -135,6 +135,8 @@ class Gui():
         self.output_frame.rowconfigure(0, weight=1)
         self.output_frame.columnconfigure(0, weight=1)
         self.output_frame.grid(row=0, column=1, sticky='NSWE')
+        self.default_bg_color = self.output_frame.cget('bg')
+        self.unread = False
         #WRITE FRAME
         self.input_frame = tk.LabelFrame(self.main_frame, \
         text=self.res.input_label, width=BASE_SIZE[0]*0.75, height=BASE_SIZE[1]/3)
@@ -190,3 +192,4 @@ class Gui():
         #   THREAD UPDATE MENU                                                   #
         ########################################################################
         self.client.thread_list.create_thread('update_menu', self)
+        self.client.thread_list.create_thread('unread_msg', self)

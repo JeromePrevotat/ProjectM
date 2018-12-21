@@ -35,6 +35,9 @@ class Threads():
         if thread_name == 'user_list':
             self.new_thread = Thread(target=self.user_list_thread, daemon=True)
             self.new_thread.start()
+        if thread_name == 'unread_msg':
+            self.new_thread = Thread(target=self.unread_msg, daemon=True)
+            self.new_thread.start()
 
     def update_menu(self, gui):
         """Thread disabling the Connect Menu if already connected to a Server."""
@@ -104,6 +107,21 @@ class Threads():
                 self.client.gui.msg_output.insert(tk.INSERT, msg + '\nAt ' + \
                 tFormat.get_time_format(self.client.gui) + '\n')
                 self.client.gui.msg_output.config(state='disabled')
+                self.client.gui.unread = True
+
+    def unread_msg(self):
+        """Flashes the Output Frame for an Unread Message."""
+        while True:
+            if self.client.gui.msg_output.vbar.get()[1] == 1.0:
+                if self.client.gui.output_frame['bg'] != self.client.gui.default_bg_color:
+                    self.client.gui.output_frame.config(bg=self.client.gui.default_bg_color)
+                self.client.gui.unread = False
+            if self.client.gui.unread:
+                if self.client.gui.output_frame['bg'] == self.client.gui.default_bg_color:
+                    self.client.gui.output_frame.config(bg='RED')
+                else:
+                    self.client.gui.output_frame.config(bg=self.client.gui.default_bg_color)
+            time.sleep(0.5)
 
     def user_list_thread(self):
         """Thread displaying connected Users."""
